@@ -6,6 +6,7 @@ mod livestock;
 mod pasture;
 mod snapshot;
 mod species;
+mod warehouse;
 
 use std::{fs::OpenOptions, path::Path, vec};
 
@@ -15,8 +16,12 @@ use feeding_report::*;
 use herd::*;
 use livestock::*;
 use pasture::*;
+use rand::{prelude::SliceRandom, Rng};
+use serde::ser::SerializeStruct;
 use snapshot::*;
 use species::*;
+
+use crate::warehouse::Warehouse;
 
 mod config {
     use std::time::Duration;
@@ -71,6 +76,8 @@ fn main() {
     snapshot.expand_employees_random(50, &names, &surnames);
 
     snapshot.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
+
+    snapshot.expand_warehouses_random(16);
 
     snapshot.saveToDir(config::RESULT_DIR);
 }

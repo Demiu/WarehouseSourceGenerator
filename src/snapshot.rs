@@ -7,8 +7,9 @@ use std::{
 use chrono::{Local, NaiveDateTime};
 use rand::{
     distributions::{Slice, Uniform},
-    prelude::Distribution,
+    prelude::{Distribution, SliceRandom},
     seq::index::IndexVecIntoIter,
+    Rng,
 };
 use serde::Serialize;
 
@@ -21,6 +22,7 @@ use crate::{
     livestock::{self, Livestock},
     pasture::Pasture,
     species::{self, Species},
+    warehouse::Warehouse,
 };
 
 pub struct Snapshot {
@@ -31,6 +33,7 @@ pub struct Snapshot {
     pub livestock: Vec<Livestock<'static>>,
     pub employees: Vec<Employee<'static, 'static>>,
     pub health_reports: Vec<HealthReport>,
+    pub warehouses: Vec<Warehouse>,
 }
 
 impl Snapshot {
@@ -43,6 +46,7 @@ impl Snapshot {
             livestock: vec![],
             employees: vec![],
             health_reports: vec![],
+            warehouses: vec![],
         }
     }
 
@@ -123,8 +127,10 @@ impl Snapshot {
             for id in indicies {
                 let doctor = employee_distribution.sample(&mut rng);
                 let ill_count = (herd.size as f32 * ill_distribution.sample(&mut rng)) as u32;
-                let severly_ill_count = (herd.size as f32 * severly_ill_distribution.sample(&mut rng)) as u32;
-                let terminal_count = (herd.size as f32 * terminal_distribution.sample(&mut rng)) as u32;
+                let severly_ill_count =
+                    (herd.size as f32 * severly_ill_distribution.sample(&mut rng)) as u32;
+                let terminal_count =
+                    (herd.size as f32 * terminal_distribution.sample(&mut rng)) as u32;
                 let healthy_count = herd.size - ill_count - severly_ill_count - terminal_count;
                 self.health_reports.push(HealthReport::new(
                     id as u32,
@@ -138,6 +144,19 @@ impl Snapshot {
                 ));
                 date += interval;
             }
+        }
+    }
+
+    pub fn expand_warehouses_random(&mut self, count: usize) {
+        let mut rng = rand::thread_rng();
+        let warehouse_managers = self.employees.choose_multiple(&mut rng, 16);
+        for (id, manager) in warehouse_managers.enumerate() {
+            self.warehouses.push(Warehouse::new(
+                id as u32,
+                manager,
+                rng.gen_range(0.0..40000.0),
+                rng.gen_range(0.0..90000.0),
+            ));
         }
     }
 
@@ -155,6 +174,10 @@ impl Snapshot {
         saveToFile(
             dir.join("health_report").with_extension("csv"),
             &self.health_reports,
+        );
+        saveToFile(
+            dir.join("warehouse").with_extension("csv"),
+            &self.warehouses,
         );
     }
 }
