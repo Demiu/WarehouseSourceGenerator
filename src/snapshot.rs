@@ -71,7 +71,7 @@ impl Snapshot {
         for id in indicices {
             let birth_offset = chrono::Duration::from_std(distribution.sample(&mut rng)).unwrap();
             self.livestock.push(Livestock::new(
-                id as u32,
+                id,
                 birth_min + birth_offset,
                 None,
                 None,
@@ -110,7 +110,7 @@ impl Snapshot {
                     (herd.size as f32 * terminal_distribution.sample(&mut rng)) as u32;
                 let healthy_count = herd.size - ill_count - severly_ill_count - terminal_count;
                 self.health_reports.push(HealthReport::new(
-                    id as u32,
+                    id,
                     doctor,
                     herd,
                     date,

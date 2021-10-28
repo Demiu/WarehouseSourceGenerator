@@ -7,7 +7,7 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct Employee<'a, 'b> {
-    pub id: u32,
+    pub id: usize,
     name: &'a str,
     surname: &'b str,
     pesel: u64,
@@ -17,7 +17,7 @@ pub struct Employee<'a, 'b> {
 
 impl<'a, 'b> Employee<'a, 'b> {
     pub const fn new(
-        id: u32,
+        id: usize,
         name: &'a str,
         surname: &'b str,
         pesel: u64,
@@ -50,7 +50,7 @@ pub fn expand_employee_vec(
 
     for _ in 0..count {
         employees.push(Employee::new(
-            employees.len() as u32,
+            employees.len(),
             name_distribution.sample(&mut rng),
             surname_distribution.sample(&mut rng),
             random_pesel(),

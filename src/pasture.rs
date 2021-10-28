@@ -18,13 +18,13 @@ pub struct PastureAreaMinMax {
 
 #[derive(Serialize)]
 pub struct Pasture {
-    pub id: u32,
+    pub id: usize,
     area: f32,
     kind: PastureKind,
 }
 
 impl Pasture {
-    pub const fn new(id: u32, area: f32, kind: PastureKind) -> Self {
+    pub const fn new(id: usize, area: f32, kind: PastureKind) -> Self {
         Pasture { id, area, kind }
     }
 }
@@ -44,7 +44,7 @@ pub fn expand_pasture_vec(
             _ => panic!(),
         };
         pastures.push(Pasture::new(
-            pastures.len() as u32,
+            pastures.len(),
             rng.gen_range(size_ranges[kind].min..=size_ranges[kind].max),
             kind,
         ));

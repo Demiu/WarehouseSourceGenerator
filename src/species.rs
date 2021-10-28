@@ -15,7 +15,7 @@ pub struct SpeciesAreaRequirements {
 
 #[derive(Serialize)]
 pub struct Species<'a> {
-    pub id: u32,
+    pub id: usize,
     name: &'a str,
     kind: SpeciesKind,
 
@@ -25,7 +25,7 @@ pub struct Species<'a> {
 
 impl<'a> Species<'a> {
     pub const fn new(
-        id: u32,
+        id: usize,
         name: &'a str,
         kind: SpeciesKind,
         area_requirements: Option<SpeciesAreaRequirements>,

@@ -6,16 +6,16 @@ use crate::{config, pasture::Pasture};
 
 #[derive(Serialize)]
 pub struct FeedingReport {
-    pub id: u32,
+    pub id: usize,
     pub date: NaiveDate,
-    pub pasture_id: u32,
+    pub pasture_id: usize,
     pub start_fill_pct: f32,
     pub end_fill_pct: f32,
 }
 
 impl FeedingReport {
     pub const fn new(
-        id: u32,
+        id: usize,
         date: NaiveDate,
         pasture: &Pasture,
         start_fill_pct: f32,
@@ -49,7 +49,7 @@ pub fn generate_feeding_report_vec(
     for pasture in pastures {
         let mut date = first_report_date;
         ret.push(FeedingReport::new(
-            ret.len() as u32,
+            ret.len(),
             date.date(),
             pasture,
             100.0,
@@ -61,7 +61,7 @@ pub fn generate_feeding_report_vec(
             let start_fill = rng.gen_range(0.0..prev_report.end_fill_pct);
             let end_fill = rng.gen_range(start_fill..=100.0);
             ret.push(FeedingReport::new(
-                ret.len() as u32,
+                ret.len(),
                 date.date(),
                 pasture,
                 start_fill,

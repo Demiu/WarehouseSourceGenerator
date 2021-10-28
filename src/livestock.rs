@@ -6,17 +6,17 @@ use crate::{config, herd::Herd, species::Species};
 
 #[derive(Serialize)]
 pub struct Livestock<'a> {
-    pub id: u32,
+    pub id: usize,
     birth: NaiveDateTime,
     disposal: Option<NaiveDateTime>,
     disposal_purpose: Option<&'a str>,
-    species_id: u32,
-    herd_id: u32,
+    species_id: usize,
+    herd_id: usize,
 }
 
 impl<'a> Livestock<'a> {
     pub const fn new(
-        id: u32,
+        id: usize,
         birth: NaiveDateTime,
         disposal: Option<NaiveDateTime>,
         disposal_purpose: Option<&'a str>,

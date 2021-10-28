@@ -4,14 +4,14 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct Warehouse {
-    id: u32,
-    manager_id: u32,
+    id: usize,
+    manager_id: usize,
     area: f32,
     volume: f32,
 }
 
 impl Warehouse {
-    pub const fn new(id: u32, manager: &Employee, area: f32, volume: f32) -> Self {
+    pub const fn new(id: usize, manager: &Employee, area: f32, volume: f32) -> Self {
         Self {
             id,
             manager_id: manager.id,
@@ -30,7 +30,7 @@ pub fn expand_warehouse_vec(
 
     for manager in employees.choose_multiple(&mut rng, count) {
         warehouses.push(Warehouse::new(
-            warehouses.len() as u32,
+            warehouses.len(),
             manager,
             rng.gen_range(0.0..40000.0),
             rng.gen_range(0.0..90000.0),

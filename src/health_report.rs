@@ -9,9 +9,9 @@ use crate::{
 
 #[derive(Serialize)]
 pub struct HealthReport {
-    pub id: u32,
-    employee_id: u32,
-    herd_id: u32,
+    pub id: usize,
+    employee_id: usize,
+    herd_id: usize,
     timestamp: NaiveDateTime,
     healthy_count: u32,
     ill_count: u32,
@@ -21,7 +21,7 @@ pub struct HealthReport {
 
 impl HealthReport {
     pub const fn new(
-        id: u32,
+        id: usize,
         doctor: &Employee,
         herd: &Herd,
         timestamp: NaiveDateTime,
