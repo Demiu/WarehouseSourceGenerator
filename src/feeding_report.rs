@@ -29,39 +29,29 @@ impl FeedingReport {
             end_fill_pct,
         }
     }
+}
 
-    pub fn generate_random(pastures: &Vec<Pasture>) -> Vec<Self> {
-        let count: i32 = config::FEEDING_REPORT_COUNT;
-        let interval = chrono::Duration::from_std(config::FEEDING_REPORT_INTERVAL).unwrap();
-        let last_report: NaiveDateTime = Local::now().naive_local();
+pub fn generate_feeding_report_vec(pastures: &Vec<Pasture>, count_per_pasture: usize, report_interval: Duration, last_report_date: Option<NaiveDateTime>) -> Vec<FeedingReport> {
+    let last_report_date = match last_report_date {
+        None => Local::now().naive_local(),
+        Some(date) => date,
+    };
+    let first_report_date = last_report_date - report_interval * count_per_pasture as i32;
 
-        let mut rng = rand::thread_rng();
-        let mut date = last_report - interval * count;
+    let mut rng = rand::thread_rng();
 
-        let mut reports = Vec::with_capacity(count as usize);
-        for pasture in pastures {
-            reports.push(FeedingReport::new(
-                reports.len() as u32,
-                date.date(),
-                pasture,
-                rng.gen(),
-                100.0,
-            ))
+    let mut ret = vec![];
+    for pasture in pastures {
+        let mut date = first_report_date;
+        ret.push(FeedingReport::new(ret.len() as u32, date.date(), pasture, 100.0, rng.gen()));
+        for _ in 0..(count_per_pasture-1) {
+            date += report_interval;
+            let prev_report = ret.last().unwrap();
+            let start_fill = rng.gen_range(0.0..prev_report.end_fill_pct);
+            let end_fill = rng.gen_range(start_fill..=100.0);
+            ret.push(FeedingReport::new(ret.len() as u32, date.date(), pasture, start_fill, end_fill));
         }
-        for (i, pasture) in (pastures.len()..count as usize).zip(pastures.iter().cycle()) {
-            let previous_report = &reports[i - pastures.len()];
-            let start_fill = rng.gen_range(0.0..previous_report.end_fill_pct);
-            let end_fill = rng.gen_range(start_fill..100.0);
-            reports.push(FeedingReport::new(
-                i as u32,
-                date.date(),
-                pasture,
-                start_fill,
-                end_fill,
-            ));
-            date += interval;
-        }
-
-        return reports;
     }
+    
+    return ret;
 }

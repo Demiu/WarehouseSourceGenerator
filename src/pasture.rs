@@ -36,8 +36,7 @@ pub fn expand_pasture_vec(
 ) {
     let mut rng = rand::thread_rng();
 
-    let indicices = pastures.len()..(pastures.len() + count);
-    for id in indicices {
+    for _ in 0..count {
         let kind = match rng.gen_range(0..3) {
             0 => PastureKind::Open,
             1 => PastureKind::Covered,
@@ -45,7 +44,7 @@ pub fn expand_pasture_vec(
             _ => panic!(),
         };
         pastures.push(Pasture::new(
-            id as u32,
+            pastures.len() as u32,
             rng.gen_range(size_ranges[kind].min..=size_ranges[kind].max),
             kind,
         ));

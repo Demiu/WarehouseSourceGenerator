@@ -11,7 +11,7 @@ mod warehouse;
 
 use std::{fs::OpenOptions, path::Path, vec};
 
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
 use employee::*;
 use enum_map::enum_map;
 use feeding_report::*;
@@ -59,7 +59,7 @@ fn main() {
     ];
     expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
     expand_herd_vec(&mut ss.herds, &ss.species, &ss.pastures);
-    ss.feeding_reports = FeedingReport::generate_random(&ss.pastures);
+    ss.feeding_reports = generate_feeding_report_vec(&ss.pastures, 1000, Duration::days(1), None);
 
     let birth_min = NaiveDateTime::new(
         NaiveDate::from_ymd(2000, 1, 1),

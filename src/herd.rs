@@ -30,10 +30,9 @@ pub fn expand_herd_vec(herds: &mut Vec<Herd>, species: &Vec<Species>, pastures: 
     let mut rng = rand::thread_rng();
     let species_distribution = Slice::new(species).unwrap();
 
-    let starting_idx = herds.len();
-    for (i, pasture) in pastures.iter().enumerate() {
+    for pasture in pastures.iter() {
         herds.push(Herd::new(
-            (starting_idx + i) as u32,
+            herds.len() as u32,
             pasture,
             species_distribution.sample(&mut rng),
         ));
