@@ -17,6 +17,7 @@ use crate::{
     config,
     employee::{self, random_account_number, random_pesel, Employee},
     feeding_report::FeedingReport,
+    headcount_report::HeadcountReport,
     health_report::HealthReport,
     herd::{self, Herd},
     livestock::{self, Livestock},
@@ -149,7 +150,7 @@ impl Snapshot {
 
     pub fn expand_warehouses_random(&mut self, count: usize) {
         let mut rng = rand::thread_rng();
-        let warehouse_managers = self.employees.choose_multiple(&mut rng, 16);
+        let warehouse_managers = self.employees.choose_multiple(&mut rng, count);
         for (id, manager) in warehouse_managers.enumerate() {
             self.warehouses.push(Warehouse::new(
                 id as u32,

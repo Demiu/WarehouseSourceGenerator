@@ -1,5 +1,6 @@
 mod employee;
 mod feeding_report;
+mod headcount_report;
 mod health_report;
 mod herd;
 mod livestock;
@@ -12,6 +13,7 @@ use std::{fs::OpenOptions, path::Path, vec};
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use employee::*;
+use enum_map::enum_map;
 use feeding_report::*;
 use herd::*;
 use livestock::*;
@@ -39,15 +41,14 @@ fn main() {
     let surnames = vec![
         "Ali", "Ash", "Cho", "Ito", "Kim", "Lis", "Rey", "Sun", "Way", "Xie", "Zhu",
     ];
+    let pasture_size_ranges = enum_map! {
+        PastureKind::Open => PastureAreaMinMax { min: 10_000., max: 1_000_000. },
+        PastureKind::Covered => PastureAreaMinMax { min: 1_000., max: 90_000. },
+        PastureKind::Individual => PastureAreaMinMax { min: 100., max: 8_100. },
+    };
 
-    let mut snapshot = Snapshot::new();
-    snapshot.pastures = vec![
-        Pasture::new(0, 1440000., PastureKind::Open),
-        Pasture::new(1, 40000., PastureKind::Covered),
-        Pasture::new(2, 1000., PastureKind::Individual),
-        Pasture::new(3, 10000., PastureKind::Open),
-    ];
-    snapshot.species = vec![
+    let mut ss = Snapshot::new();
+    ss.species = vec![
         Species::new(0, "Angus Cow", SpeciesKind::Animal),
         Species::new(1, "Holstein Cow", SpeciesKind::Animal),
         Species::new(2, "Chicken", SpeciesKind::Animal),
@@ -56,28 +57,24 @@ fn main() {
         Species::new(5, "Corn", SpeciesKind::Plant),
         Species::new(6, "Soybeans", SpeciesKind::Plant),
     ];
-    snapshot.herds = vec![
-        Herd::new(0, &snapshot.pastures[0], &snapshot.species[0]),
-        Herd::new(1, &snapshot.pastures[1], &snapshot.species[1]),
-        Herd::new(2, &snapshot.pastures[2], &snapshot.species[2]),
-        Herd::new(3, &snapshot.pastures[3], &snapshot.species[3]),
-    ];
-    snapshot.feeding_reports = FeedingReport::generate_random(&snapshot.pastures);
+    expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
+    expand_herd_vec(&mut ss.herds, &ss.species, &ss.pastures);
+    ss.feeding_reports = FeedingReport::generate_random(&ss.pastures);
 
     let birth_min = NaiveDateTime::new(
         NaiveDate::from_ymd(2000, 1, 1),
         NaiveTime::from_hms(00, 00, 00),
     );
-    snapshot.expand_livestock_random(0, 10_000, birth_min);
-    snapshot.expand_livestock_random(1, 1000, birth_min);
-    snapshot.expand_livestock_random(2, 5000, birth_min);
-    snapshot.expand_livestock_random(3, 500, birth_min);
+    ss.expand_livestock_random(0, 10_000, birth_min);
+    ss.expand_livestock_random(1, 1000, birth_min);
+    ss.expand_livestock_random(2, 5000, birth_min);
+    ss.expand_livestock_random(3, 500, birth_min);
 
-    snapshot.expand_employees_random(50, &names, &surnames);
+    ss.expand_employees_random(50, &names, &surnames);
 
-    snapshot.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
+    ss.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
 
-    snapshot.expand_warehouses_random(16);
+    ss.expand_warehouses_random(16);
 
-    snapshot.saveToDir(config::RESULT_DIR);
+    ss.saveToDir(config::RESULT_DIR);
 }

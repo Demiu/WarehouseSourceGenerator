@@ -1,4 +1,8 @@
-use crate::{pasture::Pasture, species::Species};
+use crate::{
+    pasture::{self, Pasture},
+    species::Species,
+};
+use rand::{distributions::Slice, prelude::Distribution};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -19,5 +23,19 @@ impl Herd {
             species_id: species.id,
             size: 0,
         }
+    }
+}
+
+pub fn expand_herd_vec(herds: &mut Vec<Herd>, species: &Vec<Species>, pastures: &Vec<Pasture>) {
+    let mut rng = rand::thread_rng();
+    let species_distribution = Slice::new(species).unwrap();
+
+    let starting_idx = herds.len();
+    for (i, pasture) in pastures.iter().enumerate() {
+        herds.push(Herd::new(
+            (starting_idx + i) as u32,
+            pasture,
+            species_distribution.sample(&mut rng),
+        ));
     }
 }
