@@ -122,14 +122,19 @@ impl Snapshot {
             let indicies = self.health_reports.len()..(self.health_reports.len() + count_per_herd);
             for id in indicies {
                 let doctor = employee_distribution.sample(&mut rng);
+                let ill_count = (herd.size as f32 * ill_distribution.sample(&mut rng)) as u32;
+                let severly_ill_count = (herd.size as f32 * severly_ill_distribution.sample(&mut rng)) as u32;
+                let terminal_count = (herd.size as f32 * terminal_distribution.sample(&mut rng)) as u32;
+                let healthy_count = herd.size - ill_count - severly_ill_count - terminal_count;
                 self.health_reports.push(HealthReport::new(
                     id as u32,
                     doctor,
                     herd,
                     date,
-                    ill_distribution.sample(&mut rng),
-                    severly_ill_distribution.sample(&mut rng),
-                    terminal_distribution.sample(&mut rng),
+                    healthy_count,
+                    ill_count,
+                    severly_ill_count,
+                    terminal_count,
                 ));
                 date += interval;
             }

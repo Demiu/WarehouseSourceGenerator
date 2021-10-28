@@ -20,19 +20,16 @@ pub struct HealthReport {
 }
 
 impl HealthReport {
-    pub fn new(
+    pub const fn new(
         id: u32,
         doctor: &Employee,
         herd: &Herd,
         timestamp: NaiveDateTime,
-        ill_pct: f32,
-        severly_ill_pct: f32,
-        terminal_pct: f32,
+        healthy_count: u32,
+        ill_count: u32,
+        severly_ill_count: u32,
+        terminal_count: u32,
     ) -> Self {
-        let ill_count = (herd.size as f32 * ill_pct) as u32;
-        let severly_ill_count = (herd.size as f32 * severly_ill_pct) as u32;
-        let terminal_count = (herd.size as f32 * terminal_pct) as u32;
-        let healthy_count = herd.size - ill_count - severly_ill_count - terminal_count;
         Self {
             id,
             employee_id: doctor.id,
