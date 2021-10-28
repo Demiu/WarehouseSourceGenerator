@@ -25,13 +25,14 @@ mod config {
 }
 
 fn main() {
-    let pastures = vec![
+    let mut snapshot = Snapshot::new();
+    snapshot.pastures = vec![
         Pasture::new(0, 1440000., PastureKind::Open),
         Pasture::new(1, 40000., PastureKind::Covered),
         Pasture::new(2, 1000., PastureKind::Individual),
         Pasture::new(3, 10000., PastureKind::Open),
     ];
-    let species = vec![
+    snapshot.species = vec![
         Species::new(0, "Angus Cow", SpeciesKind::Animal),
         Species::new(1, "Holstein Cow", SpeciesKind::Animal),
         Species::new(2, "Chicken", SpeciesKind::Animal),
@@ -40,27 +41,18 @@ fn main() {
         Species::new(5, "Corn", SpeciesKind::Plant),
         Species::new(6, "Soybeans", SpeciesKind::Plant),
     ];
-    let herds = vec![
-        Herd::new(0, &pastures[0], &species[0]),
-        Herd::new(1, &pastures[1], &species[1]),
-        Herd::new(2, &pastures[2], &species[2]),
-        Herd::new(3, &pastures[3], &species[3]),
+    snapshot.herds = vec![
+        Herd::new(0, &snapshot.pastures[0], &snapshot.species[0]),
+        Herd::new(1, &snapshot.pastures[1], &snapshot.species[1]),
+        Herd::new(2, &snapshot.pastures[2], &snapshot.species[2]),
+        Herd::new(3, &snapshot.pastures[3], &snapshot.species[3]),
     ];
-    let feeding_reports = FeedingReport::generate_random(&pastures);
+    snapshot.feeding_reports = FeedingReport::generate_random(&snapshot.pastures);
 
     let birth_min = NaiveDateTime::new(
         NaiveDate::from_ymd(2000, 1, 1),
         NaiveTime::from_hms(00, 00, 00),
     );
-    let mut livestock = vec![];
-    Livestock::expand_herd_random(&mut livestock, &herds[0], 10_000, birth_min);
-
-    let ss = Snapshot {
-        pastures,
-        species,
-        herds,
-        feeding_reports,
-        livestock,
-    };
-    ss.saveToDir(config::RESULT_DIR);
+    snapshot.expand_livestock_random(0, 10_000, birth_min);
+    snapshot.saveToDir(config::RESULT_DIR);
 }

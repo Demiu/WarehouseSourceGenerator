@@ -4,6 +4,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use chrono::{Local, NaiveDateTime};
+use rand::{distributions::Uniform, prelude::Distribution};
 use serde::Serialize;
 
 use crate::{
@@ -24,6 +26,45 @@ pub struct Snapshot<'a, 'b> {
 }
 
 impl<'a, 'b> Snapshot<'a, 'b> {
+    pub const fn new() -> Self {
+        Snapshot {
+            pastures: vec![],
+            species: vec![],
+            herds: vec![],
+            feeding_reports: vec![],
+            livestock: vec![],
+        }
+    }
+
+    pub fn expand_livestock_random(
+        &mut self,
+        herd_id: usize,
+        count: usize,
+        birth_min: NaiveDateTime,
+    ) {
+        let herd = &self.herds[herd_id];
+        let mut rng = rand::thread_rng();
+
+        let birth_span = Local::now()
+            .naive_local()
+            .signed_duration_since(birth_min)
+            .to_std()
+            .unwrap();
+        let distribution = Uniform::new(std::time::Duration::new(0, 0), birth_span);
+
+        let indicices = self.livestock.len()..(count + self.livestock.len());
+        for id in indicices {
+            let birth_offset = chrono::Duration::from_std(distribution.sample(&mut rng)).unwrap();
+            self.livestock.push(Livestock::new(
+                id as u32,
+                birth_min + birth_offset,
+                None,
+                None,
+                herd,
+            ));
+        }
+    }
+
     pub fn saveToDir(&self, dir: &str) {
         let dir = Path::new(dir);
         saveToFile(dir.join("pasture").with_extension("csv"), &self.pastures);
