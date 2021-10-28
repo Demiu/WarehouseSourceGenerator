@@ -1,13 +1,16 @@
+mod employee;
 mod feeding_report;
+mod health_report;
 mod herd;
 mod livestock;
 mod pasture;
 mod snapshot;
 mod species;
 
-use std::{fs::OpenOptions, path::Path};
+use std::{fs::OpenOptions, path::Path, vec};
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use employee::*;
 use feeding_report::*;
 use herd::*;
 use livestock::*;
@@ -25,6 +28,13 @@ mod config {
 }
 
 fn main() {
+    let names = vec![
+        "Ben", "Bob", "Gus", "Jim", "Joe", "Sam", "Tim", "Tom", "Ada", "Ann", "Deb",
+    ];
+    let surnames = vec![
+        "Ali", "Ash", "Cho", "Ito", "Kim", "Lis", "Rey", "Sun", "Way", "Xie", "Zhu",
+    ];
+
     let mut snapshot = Snapshot::new();
     snapshot.pastures = vec![
         Pasture::new(0, 1440000., PastureKind::Open),
@@ -54,5 +64,13 @@ fn main() {
         NaiveTime::from_hms(00, 00, 00),
     );
     snapshot.expand_livestock_random(0, 10_000, birth_min);
+    snapshot.expand_livestock_random(1, 1000, birth_min);
+    snapshot.expand_livestock_random(2, 5000, birth_min);
+    snapshot.expand_livestock_random(3, 500, birth_min);
+
+    snapshot.expand_employees_random(50, &names, &surnames);
+
+    snapshot.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
+
     snapshot.saveToDir(config::RESULT_DIR);
 }

@@ -5,27 +5,35 @@ use std::{
 };
 
 use chrono::{Local, NaiveDateTime};
-use rand::{distributions::Uniform, prelude::Distribution};
+use rand::{
+    distributions::{Slice, Uniform},
+    prelude::Distribution,
+    seq::index::IndexVecIntoIter,
+};
 use serde::Serialize;
 
 use crate::{
     config,
+    employee::{self, random_account_number, random_pesel, Employee},
     feeding_report::FeedingReport,
+    health_report::HealthReport,
     herd::{self, Herd},
     livestock::{self, Livestock},
     pasture::Pasture,
     species::{self, Species},
 };
 
-pub struct Snapshot<'a, 'b> {
+pub struct Snapshot {
     pub pastures: Vec<Pasture>,
-    pub species: Vec<Species<'a>>,
+    pub species: Vec<Species<'static>>,
     pub herds: Vec<Herd>,
     pub feeding_reports: Vec<FeedingReport>,
-    pub livestock: Vec<Livestock<'b>>,
+    pub livestock: Vec<Livestock<'static>>,
+    pub employees: Vec<Employee<'static, 'static>>,
+    pub health_reports: Vec<HealthReport>,
 }
 
-impl<'a, 'b> Snapshot<'a, 'b> {
+impl Snapshot {
     pub const fn new() -> Self {
         Snapshot {
             pastures: vec![],
@@ -33,6 +41,8 @@ impl<'a, 'b> Snapshot<'a, 'b> {
             herds: vec![],
             feeding_reports: vec![],
             livestock: vec![],
+            employees: vec![],
+            health_reports: vec![],
         }
     }
 
@@ -42,7 +52,7 @@ impl<'a, 'b> Snapshot<'a, 'b> {
         count: usize,
         birth_min: NaiveDateTime,
     ) {
-        let herd = &self.herds[herd_id];
+        let herd = &mut self.herds[herd_id];
         let mut rng = rand::thread_rng();
 
         let birth_span = Local::now()
@@ -52,7 +62,7 @@ impl<'a, 'b> Snapshot<'a, 'b> {
             .unwrap();
         let distribution = Uniform::new(std::time::Duration::new(0, 0), birth_span);
 
-        let indicices = self.livestock.len()..(count + self.livestock.len());
+        let indicices = self.livestock.len()..(self.livestock.len() + count);
         for id in indicices {
             let birth_offset = chrono::Duration::from_std(distribution.sample(&mut rng)).unwrap();
             self.livestock.push(Livestock::new(
@@ -62,6 +72,67 @@ impl<'a, 'b> Snapshot<'a, 'b> {
                 None,
                 herd,
             ));
+            herd.size += 1;
+        }
+    }
+
+    pub fn expand_employees_random(
+        &mut self,
+        count: usize,
+        names: &Vec<&'static str>,
+        surnames: &Vec<&'static str>,
+    ) {
+        let mut rng = rand::thread_rng();
+        let name_distribution = Slice::new(names).unwrap();
+        let surname_distribution = Slice::new(surnames).unwrap();
+        let salary_distribution = Uniform::new(3000.0, 12000.0);
+
+        let indicies = self.employees.len()..(self.employees.len() + count);
+        for id in indicies {
+            self.employees.push(Employee::new(
+                id as u32,
+                name_distribution.sample(&mut rng),
+                surname_distribution.sample(&mut rng),
+                random_pesel(),
+                random_account_number(),
+                salary_distribution.sample(&mut rng),
+            ));
+        }
+    }
+
+    pub fn expand_health_reports_random(
+        &mut self,
+        count_per_herd: usize,
+        ill_max_pct: f32,
+        severly_ill_max_pct: f32,
+        terminal_max_pct: f32,
+    ) {
+        let interval = chrono::Duration::from_std(config::FEEDING_REPORT_INTERVAL).unwrap();
+        let first_report: NaiveDateTime =
+            Local::now().naive_local() - interval * count_per_herd as i32;
+
+        let mut rng = rand::thread_rng();
+        let employee_distribution = Slice::new(&self.employees).unwrap();
+        let ill_distribution = Uniform::new(0.0, ill_max_pct);
+        let severly_ill_distribution = Uniform::new(0.0, severly_ill_max_pct);
+        let terminal_distribution = Uniform::new(0.0, terminal_max_pct);
+
+        for herd in self.herds.iter() {
+            let mut date = first_report.clone();
+            let indicies = self.health_reports.len()..(self.health_reports.len() + count_per_herd);
+            for id in indicies {
+                let doctor = employee_distribution.sample(&mut rng);
+                self.health_reports.push(HealthReport::new(
+                    id as u32,
+                    doctor,
+                    herd,
+                    date,
+                    ill_distribution.sample(&mut rng),
+                    severly_ill_distribution.sample(&mut rng),
+                    terminal_distribution.sample(&mut rng),
+                ));
+                date += interval;
+            }
         }
     }
 
@@ -75,6 +146,11 @@ impl<'a, 'b> Snapshot<'a, 'b> {
             &self.feeding_reports,
         );
         saveToFile(dir.join("livestock").with_extension("csv"), &self.livestock);
+        saveToFile(dir.join("employee").with_extension("csv"), &self.employees);
+        saveToFile(
+            dir.join("health_report").with_extension("csv"),
+            &self.health_reports,
+        );
     }
 }
 

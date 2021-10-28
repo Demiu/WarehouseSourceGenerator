@@ -49,7 +49,6 @@ impl FeedingReport {
             ))
         }
         for (i, pasture) in (pastures.len()..count as usize).zip(pastures.iter().cycle()) {
-            date += interval;
             let previous_report = &reports[i - pastures.len()];
             let start_fill = rng.gen_range(0.0..previous_report.end_fill_pct);
             let end_fill = rng.gen_range(start_fill..100.0);
@@ -60,6 +59,7 @@ impl FeedingReport {
                 start_fill,
                 end_fill,
             ));
+            date += interval;
         }
 
         return reports;
