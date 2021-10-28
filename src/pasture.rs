@@ -1,9 +1,13 @@
+use serde::Serialize;
+
+#[derive(Serialize)]
 pub enum PastureKind {
     Open,
     Covered,
     Individual,
 }
 
+#[derive(Serialize)]
 pub struct Pasture {
     pub id: u32,
     area: f32,

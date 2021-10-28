@@ -1,5 +1,7 @@
 use crate::{pasture::Pasture, species::Species};
+use serde::Serialize;
 
+#[derive(Serialize)]
 pub struct Herd {
     pub id: u32,
     pub pasture_id: u32,

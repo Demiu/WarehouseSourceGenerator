@@ -2,19 +2,26 @@ mod feeding_report;
 mod herd;
 mod livestock;
 mod pasture;
+mod snapshot;
 mod species;
 
+use std::{fs::OpenOptions, path::Path};
+
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use feeding_report::*;
 use herd::*;
 use livestock::*;
 use pasture::*;
+use snapshot::*;
 use species::*;
 
 mod config {
     use std::time::Duration;
 
-    pub const FEEDING_REPORT_COUNT: i32 = 1_000_000;
-    pub const FEEDING_REPORT_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60);
+    pub const RESULT_DIR: &str = "out";
+
+    pub const FEEDING_REPORT_COUNT: i32 = 1_000;
+    pub const FEEDING_REPORT_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60 * 60);
 }
 
 fn main() {
@@ -40,4 +47,20 @@ fn main() {
         Herd::new(3, &pastures[3], &species[3]),
     ];
     let feeding_reports = FeedingReport::generate_random(&pastures);
+
+    let birth_min = NaiveDateTime::new(
+        NaiveDate::from_ymd(2000, 1, 1),
+        NaiveTime::from_hms(00, 00, 00),
+    );
+    let mut livestock = vec![];
+    Livestock::expand_herd_random(&mut livestock, &herds[0], 10_000, birth_min);
+
+    let ss = Snapshot {
+        pastures,
+        species,
+        herds,
+        feeding_reports,
+        livestock,
+    };
+    ss.saveToDir(config::RESULT_DIR);
 }

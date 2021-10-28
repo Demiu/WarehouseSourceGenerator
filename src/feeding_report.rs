@@ -1,9 +1,10 @@
 use chrono::{prelude::*, Duration};
 use rand::{prelude::SliceRandom, Rng};
+use serde::Serialize;
 
 use crate::{config, pasture::Pasture};
 
-#[derive(Debug)]
+#[derive(Serialize)]
 pub struct FeedingReport {
     pub id: u32,
     pub date: NaiveDate,
@@ -16,14 +17,14 @@ impl FeedingReport {
     pub const fn new(
         id: u32,
         date: NaiveDate,
-        pasture_id: u32,
+        pasture: &Pasture,
         start_fill_pct: f32,
         end_fill_pct: f32,
     ) -> Self {
         FeedingReport {
             id,
             date,
-            pasture_id,
+            pasture_id: pasture.id,
             start_fill_pct,
             end_fill_pct,
         }
@@ -31,31 +32,31 @@ impl FeedingReport {
 
     pub fn generate_random(pastures: &Vec<Pasture>) -> Vec<Self> {
         let count: i32 = config::FEEDING_REPORT_COUNT;
-        let interval: Duration =
-            chrono::Duration::from_std(config::FEEDING_REPORT_INTERVAL).unwrap();
+        let interval = chrono::Duration::from_std(config::FEEDING_REPORT_INTERVAL).unwrap();
         let last_report: NaiveDateTime = Local::now().naive_local();
 
         let mut rng = rand::thread_rng();
         let mut date = last_report - interval * count;
 
         let mut reports = Vec::with_capacity(count as usize);
-        reports.push(FeedingReport::new(
-            0,
-            date.date(),
-            pastures.choose(&mut rng).unwrap().id,
-            rng.gen(),
-            100.0,
-        ));
-        for i in 1..count as usize {
+        for pasture in pastures {
+            reports.push(FeedingReport::new(
+                reports.len() as u32,
+                date.date(),
+                pasture,
+                rng.gen(),
+                100.0,
+            ))
+        }
+        for (i, pasture) in (pastures.len()..count as usize).zip(pastures.iter().cycle()) {
             date += interval;
-            let previous_report = &reports[i - 1];
+            let previous_report = &reports[i - pastures.len()];
             let start_fill = rng.gen_range(0.0..previous_report.end_fill_pct);
             let end_fill = rng.gen_range(start_fill..100.0);
-            let pasture_id = pastures.choose(&mut rng).unwrap().id;
             reports.push(FeedingReport::new(
                 i as u32,
                 date.date(),
-                pasture_id,
+                pasture,
                 start_fill,
                 end_fill,
             ));
