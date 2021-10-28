@@ -46,13 +46,57 @@ fn main() {
 
     let mut ss = Snapshot::new();
     ss.species = vec![
-        Species::new(0, "Angus Cow", SpeciesKind::Animal),
-        Species::new(1, "Holstein Cow", SpeciesKind::Animal),
-        Species::new(2, "Chicken", SpeciesKind::Animal),
-        Species::new(3, "Sheep", SpeciesKind::Animal),
-        Species::new(4, "Wheat", SpeciesKind::Plant),
-        Species::new(5, "Corn", SpeciesKind::Plant),
-        Species::new(6, "Soybeans", SpeciesKind::Plant),
+        Species::new(
+            0,
+            "Angus Cow",
+            SpeciesKind::Animal,
+            Some(SpeciesAreaRequirements {
+                pastureKindToReqArea: enum_map! {
+                    PastureKind::Open => 10.,
+                    PastureKind::Covered => 8.,
+                    PastureKind::Individual => 2.,
+                },
+            }),
+        ),
+        Species::new(
+            1,
+            "Holstein Cow",
+            SpeciesKind::Animal,
+            Some(SpeciesAreaRequirements {
+                pastureKindToReqArea: enum_map! {
+                    PastureKind::Open => 10.,
+                    PastureKind::Covered => 8.,
+                    PastureKind::Individual => 2.,
+                },
+            }),
+        ),
+        Species::new(
+            2,
+            "Chicken",
+            SpeciesKind::Animal,
+            Some(SpeciesAreaRequirements {
+                pastureKindToReqArea: enum_map! {
+                    PastureKind::Open => 1.,
+                    PastureKind::Covered => 1.,
+                    PastureKind::Individual => 0.25,
+                },
+            }),
+        ),
+        Species::new(
+            3,
+            "Sheep",
+            SpeciesKind::Animal,
+            Some(SpeciesAreaRequirements {
+                pastureKindToReqArea: enum_map! {
+                    PastureKind::Open => 7.5,
+                    PastureKind::Covered => 6.,
+                    PastureKind::Individual => 3.,
+                },
+            }),
+        ),
+        Species::new(4, "Wheat", SpeciesKind::Plant, None),
+        Species::new(5, "Corn", SpeciesKind::Plant, None),
+        Species::new(6, "Soybeans", SpeciesKind::Plant, None),
     ];
     expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
     expand_herd_vec(&mut ss.herds, &ss.species, &ss.pastures);
