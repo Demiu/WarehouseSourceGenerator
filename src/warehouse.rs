@@ -1,4 +1,5 @@
 use crate::employee::Employee;
+use rand::{prelude::SliceRandom, Rng};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -17,5 +18,22 @@ impl Warehouse {
             area,
             volume,
         }
+    }
+}
+
+pub fn expand_warehouse_vec(
+    warehouses: &mut Vec<Warehouse>,
+    count: usize,
+    employees: &Vec<Employee>,
+) {
+    let mut rng = rand::thread_rng();
+
+    for manager in employees.choose_multiple(&mut rng, count) {
+        warehouses.push(Warehouse::new(
+            warehouses.len() as u32,
+            manager,
+            rng.gen_range(0.0..40000.0),
+            rng.gen_range(0.0..90000.0),
+        ));
     }
 }

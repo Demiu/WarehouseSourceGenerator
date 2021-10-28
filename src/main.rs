@@ -23,14 +23,11 @@ use serde::ser::SerializeStruct;
 use snapshot::*;
 use species::*;
 
-use crate::warehouse::Warehouse;
+use crate::warehouse::{expand_warehouse_vec, Warehouse};
 
 mod config {
     use std::time::Duration;
 
-    pub const RESULT_DIR: &str = "out";
-
-    pub const FEEDING_REPORT_COUNT: i32 = 1_000;
     pub const FEEDING_REPORT_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60 * 60);
 }
 
@@ -60,6 +57,8 @@ fn main() {
     expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
     expand_herd_vec(&mut ss.herds, &ss.species, &ss.pastures);
     ss.feeding_reports = generate_feeding_report_vec(&ss.pastures, 1000, Duration::days(1), None);
+    expand_employee_vec(&mut ss.employees, 100, &names, &surnames, 3000.0, 12000.0);
+    expand_warehouse_vec(&mut ss.warehouses, 16, &ss.employees);
 
     let birth_min = NaiveDateTime::new(
         NaiveDate::from_ymd(2000, 1, 1),
@@ -70,11 +69,7 @@ fn main() {
     ss.expand_livestock_random(2, 5000, birth_min);
     ss.expand_livestock_random(3, 500, birth_min);
 
-    ss.expand_employees_random(50, &names, &surnames);
-
     ss.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
 
-    ss.expand_warehouses_random(16);
-
-    ss.saveToDir(config::RESULT_DIR);
+    ss.saveToDir("out");
 }

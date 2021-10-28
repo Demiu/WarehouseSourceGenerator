@@ -31,7 +31,12 @@ impl FeedingReport {
     }
 }
 
-pub fn generate_feeding_report_vec(pastures: &Vec<Pasture>, count_per_pasture: usize, report_interval: Duration, last_report_date: Option<NaiveDateTime>) -> Vec<FeedingReport> {
+pub fn generate_feeding_report_vec(
+    pastures: &Vec<Pasture>,
+    count_per_pasture: usize,
+    report_interval: Duration,
+    last_report_date: Option<NaiveDateTime>,
+) -> Vec<FeedingReport> {
     let last_report_date = match last_report_date {
         None => Local::now().naive_local(),
         Some(date) => date,
@@ -43,15 +48,27 @@ pub fn generate_feeding_report_vec(pastures: &Vec<Pasture>, count_per_pasture: u
     let mut ret = vec![];
     for pasture in pastures {
         let mut date = first_report_date;
-        ret.push(FeedingReport::new(ret.len() as u32, date.date(), pasture, 100.0, rng.gen()));
-        for _ in 0..(count_per_pasture-1) {
+        ret.push(FeedingReport::new(
+            ret.len() as u32,
+            date.date(),
+            pasture,
+            100.0,
+            rng.gen(),
+        ));
+        for _ in 0..(count_per_pasture - 1) {
             date += report_interval;
             let prev_report = ret.last().unwrap();
             let start_fill = rng.gen_range(0.0..prev_report.end_fill_pct);
             let end_fill = rng.gen_range(start_fill..=100.0);
-            ret.push(FeedingReport::new(ret.len() as u32, date.date(), pasture, start_fill, end_fill));
+            ret.push(FeedingReport::new(
+                ret.len() as u32,
+                date.date(),
+                pasture,
+                start_fill,
+                end_fill,
+            ));
         }
     }
-    
+
     return ret;
 }

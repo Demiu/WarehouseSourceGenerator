@@ -15,7 +15,7 @@ use serde::Serialize;
 
 use crate::{
     config,
-    employee::{self, random_account_number, random_pesel, Employee},
+    employee::Employee,
     feeding_report::FeedingReport,
     headcount_report::HeadcountReport,
     health_report::HealthReport,
@@ -81,30 +81,6 @@ impl Snapshot {
         }
     }
 
-    pub fn expand_employees_random(
-        &mut self,
-        count: usize,
-        names: &Vec<&'static str>,
-        surnames: &Vec<&'static str>,
-    ) {
-        let mut rng = rand::thread_rng();
-        let name_distribution = Slice::new(names).unwrap();
-        let surname_distribution = Slice::new(surnames).unwrap();
-        let salary_distribution = Uniform::new(3000.0, 12000.0);
-
-        let indicies = self.employees.len()..(self.employees.len() + count);
-        for id in indicies {
-            self.employees.push(Employee::new(
-                id as u32,
-                name_distribution.sample(&mut rng),
-                surname_distribution.sample(&mut rng),
-                random_pesel(),
-                random_account_number(),
-                salary_distribution.sample(&mut rng),
-            ));
-        }
-    }
-
     pub fn expand_health_reports_random(
         &mut self,
         count_per_herd: usize,
@@ -145,19 +121,6 @@ impl Snapshot {
                 ));
                 date += interval;
             }
-        }
-    }
-
-    pub fn expand_warehouses_random(&mut self, count: usize) {
-        let mut rng = rand::thread_rng();
-        let warehouse_managers = self.employees.choose_multiple(&mut rng, count);
-        for (id, manager) in warehouse_managers.enumerate() {
-            self.warehouses.push(Warehouse::new(
-                id as u32,
-                manager,
-                rng.gen_range(0.0..40000.0),
-                rng.gen_range(0.0..90000.0),
-            ));
         }
     }
 
