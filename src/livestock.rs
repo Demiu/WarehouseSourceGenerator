@@ -109,3 +109,19 @@ pub fn kill_off_livestock_vec(
         animal.disposal_purpose = Some(DisposalPurpose::Health);
     }
 }
+
+pub fn butcher_livestock_vec(livestock: &mut Vec<Livestock>, species: &Vec<Species>, cutoff_time: NaiveDateTime) {
+    let mut rng = rand::thread_rng();
+
+    for animal in livestock {
+        if let Some(_) = animal.disposal_purpose {
+            continue;
+        }
+        let species = &species[animal.species_id];
+        let disposal = animal.birth + chrono::Duration::from_std(species.lifespan).unwrap();
+        if disposal < cutoff_time {
+            animal.disposal = Some(disposal);
+            animal.disposal_purpose = Some(DisposalPurpose::Butcher);
+        }
+    }
+}

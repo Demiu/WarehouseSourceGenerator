@@ -11,7 +11,7 @@ mod warehouse;
 
 use std::{fs::OpenOptions, path::Path, vec};
 
-use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{Duration, Local, NaiveDate, NaiveDateTime, NaiveTime};
 use employee::*;
 use enum_map::enum_map;
 use feeding_report::*;
@@ -47,6 +47,7 @@ fn main() {
         NaiveDate::from_ymd(2019, 1, 1),
         NaiveTime::from_hms(00, 00, 00),
     );
+    let snapshot1_when = Local::now().naive_local() - Duration::weeks(10);
 
     let mut ss = Snapshot::new();
     ss.species = vec![
@@ -119,6 +120,7 @@ fn main() {
         livestock_birth_min,
     );
     kill_off_livestock_vec(&mut ss.livestock, 0.1, &ss.species);
+    butcher_livestock_vec(&mut ss.livestock, &ss.species, snapshot1_when);
 
     ss.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
 
