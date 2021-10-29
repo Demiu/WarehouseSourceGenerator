@@ -12,7 +12,7 @@ pub enum SpeciesKind {
 }
 
 pub struct SpeciesAreaRequirements {
-    pub pastureKindToReqArea: EnumMap<PastureKind, f32>,
+    pub pasture_kind_to_req_area: EnumMap<PastureKind, f32>,
 }
 
 #[derive(Serialize)]

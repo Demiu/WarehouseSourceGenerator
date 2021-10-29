@@ -1,5 +1,5 @@
 use crate::{
-    pasture::{self, Pasture},
+    pasture::Pasture,
     species::Species,
 };
 use rand::{distributions::Slice, prelude::Distribution};

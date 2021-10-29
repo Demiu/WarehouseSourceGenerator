@@ -1,15 +1,13 @@
 use std::{
     fs::OpenOptions,
     ops::Deref,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 use chrono::{Local, NaiveDateTime};
 use rand::{
     distributions::{Slice, Uniform},
-    prelude::{Distribution, SliceRandom},
-    seq::index::IndexVecIntoIter,
-    Rng,
+    prelude::Distribution,
 };
 use serde::Serialize;
 
@@ -17,12 +15,11 @@ use crate::{
     config,
     employee::Employee,
     feeding_report::FeedingReport,
-    headcount_report::HeadcountReport,
     health_report::HealthReport,
-    herd::{self, Herd},
-    livestock::{self, Livestock},
+    herd::Herd,
+    livestock::Livestock,
     pasture::Pasture,
-    species::{self, Species},
+    species::Species,
     warehouse::Warehouse,
 };
 
@@ -94,29 +91,29 @@ impl Snapshot {
         }
     }
 
-    pub fn saveToDir(&self, dir: &str) {
+    pub fn save_to_dir(&self, dir: &str) {
         let dir = Path::new(dir);
-        saveToFile(dir.join("pasture").with_extension("csv"), &self.pastures);
-        saveToFile(dir.join("species").with_extension("csv"), &self.species);
-        saveToFile(dir.join("herd").with_extension("csv"), &self.herds);
-        saveToFile(
+        save_to_file(dir.join("pasture").with_extension("csv"), &self.pastures);
+        save_to_file(dir.join("species").with_extension("csv"), &self.species);
+        save_to_file(dir.join("herd").with_extension("csv"), &self.herds);
+        save_to_file(
             dir.join("feeding_report").with_extension("csv"),
             &self.feeding_reports,
         );
-        saveToFile(dir.join("livestock").with_extension("csv"), &self.livestock);
-        saveToFile(dir.join("employee").with_extension("csv"), &self.employees);
-        saveToFile(
+        save_to_file(dir.join("livestock").with_extension("csv"), &self.livestock);
+        save_to_file(dir.join("employee").with_extension("csv"), &self.employees);
+        save_to_file(
             dir.join("health_report").with_extension("csv"),
             &self.health_reports,
         );
-        saveToFile(
+        save_to_file(
             dir.join("warehouse").with_extension("csv"),
             &self.warehouses,
         );
     }
 }
 
-fn saveToFile<P, T>(path: P, data: &Vec<T>)
+fn save_to_file<P, T>(path: P, data: &Vec<T>)
 where
     P: Deref<Target = Path> + AsRef<Path>,
     T: Serialize,

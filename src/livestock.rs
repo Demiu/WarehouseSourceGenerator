@@ -1,18 +1,17 @@
 use std::time::Duration;
 
-use chrono::{Local, NaiveDate, NaiveDateTime};
+use chrono::{Local, NaiveDateTime};
 use rand::{
     distributions::Uniform,
-    prelude::{Distribution, SliceRandom},
+    prelude::Distribution,
     seq::index,
     Rng,
 };
 use serde::Serialize;
 
 use crate::{
-    config,
     herd::Herd,
-    pasture::{self, Pasture},
+    pasture::Pasture,
     species::Species,
 };
 
@@ -74,7 +73,7 @@ pub fn expand_livestock(
             .area_requirements
             .as_ref()
             .unwrap()
-            .pastureKindToReqArea[pasture.kind];
+            .pasture_kind_to_req_area[pasture.kind];
         let count = (pasture.area / area_requirement) as usize;
         for _ in 0..count {
             let birth_offset =
@@ -110,9 +109,11 @@ pub fn kill_off_livestock_vec(
     }
 }
 
-pub fn butcher_livestock_vec(livestock: &mut Vec<Livestock>, species: &Vec<Species>, cutoff_time: NaiveDateTime) {
-    let mut rng = rand::thread_rng();
-
+pub fn butcher_livestock_vec(
+    livestock: &mut Vec<Livestock>,
+    species: &Vec<Species>,
+    cutoff_time: NaiveDateTime,
+) {
     for animal in livestock {
         if let Some(_) = animal.disposal_purpose {
             continue;

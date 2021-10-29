@@ -9,21 +9,16 @@ mod snapshot;
 mod species;
 mod warehouse;
 
-use std::{fs::OpenOptions, path::Path, vec};
-
+use crate::employee::*;
+use crate::feeding_report::*;
+use crate::herd::*;
+use crate::livestock::*;
+use crate::pasture::*;
+use crate::snapshot::*;
+use crate::species::*;
+use crate::warehouse::*;
 use chrono::{Duration, Local, NaiveDate, NaiveDateTime, NaiveTime};
-use employee::*;
 use enum_map::enum_map;
-use feeding_report::*;
-use herd::*;
-use livestock::*;
-use pasture::*;
-use rand::{prelude::SliceRandom, Rng};
-use serde::ser::SerializeStruct;
-use snapshot::*;
-use species::*;
-
-use crate::warehouse::{expand_warehouse_vec, Warehouse};
 
 mod config {
     use std::time::Duration;
@@ -57,7 +52,7 @@ fn main() {
             SpeciesKind::Animal,
             639,
             Some(SpeciesAreaRequirements {
-                pastureKindToReqArea: enum_map! {
+                pasture_kind_to_req_area: enum_map! {
                     PastureKind::Open => 10.,
                     PastureKind::Covered => 8.,
                     PastureKind::Individual => 2.,
@@ -70,7 +65,7 @@ fn main() {
             SpeciesKind::Animal,
             639,
             Some(SpeciesAreaRequirements {
-                pastureKindToReqArea: enum_map! {
+                pasture_kind_to_req_area: enum_map! {
                     PastureKind::Open => 10.,
                     PastureKind::Covered => 8.,
                     PastureKind::Individual => 2.,
@@ -83,7 +78,7 @@ fn main() {
             SpeciesKind::Animal,
             42,
             Some(SpeciesAreaRequirements {
-                pastureKindToReqArea: enum_map! {
+                pasture_kind_to_req_area: enum_map! {
                     PastureKind::Open => 1.,
                     PastureKind::Covered => 1.,
                     PastureKind::Individual => 0.25,
@@ -96,7 +91,7 @@ fn main() {
             SpeciesKind::Animal,
             304,
             Some(SpeciesAreaRequirements {
-                pastureKindToReqArea: enum_map! {
+                pasture_kind_to_req_area: enum_map! {
                     PastureKind::Open => 7.5,
                     PastureKind::Covered => 6.,
                     PastureKind::Individual => 3.,
@@ -124,5 +119,5 @@ fn main() {
 
     ss.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
 
-    ss.saveToDir("out");
+    ss.save_to_dir("out");
 }

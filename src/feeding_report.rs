@@ -1,8 +1,8 @@
 use chrono::{prelude::*, Duration};
-use rand::{prelude::SliceRandom, Rng};
+use rand::Rng;
 use serde::Serialize;
 
-use crate::{config, pasture::Pasture};
+use crate::pasture::Pasture;
 
 #[derive(Serialize)]
 pub struct FeedingReport {

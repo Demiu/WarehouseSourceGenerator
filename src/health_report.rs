@@ -2,9 +2,8 @@ use chrono::NaiveDateTime;
 use serde::Serialize;
 
 use crate::{
-    employee::{self, Employee},
-    herd::{self, Herd},
-    species,
+    employee::Employee,
+    herd::Herd,
 };
 
 #[derive(Serialize)]
