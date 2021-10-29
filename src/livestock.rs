@@ -10,21 +10,27 @@ use crate::{
 };
 
 #[derive(Serialize)]
-pub struct Livestock<'a> {
+pub enum DisposalPurpose {
+    Butcher,
+    Health,
+}
+
+#[derive(Serialize)]
+pub struct Livestock {
     pub id: usize,
     birth: NaiveDateTime,
     disposal: Option<NaiveDateTime>,
-    disposal_purpose: Option<&'a str>,
+    disposal_purpose: Option<DisposalPurpose>,
     species_id: usize,
     herd_id: usize,
 }
 
-impl<'a> Livestock<'a> {
+impl Livestock {
     pub const fn new(
         id: usize,
         birth: NaiveDateTime,
         disposal: Option<NaiveDateTime>,
-        disposal_purpose: Option<&'a str>,
+        disposal_purpose: Option<DisposalPurpose>,
         herd: &Herd,
     ) -> Self {
         Livestock {

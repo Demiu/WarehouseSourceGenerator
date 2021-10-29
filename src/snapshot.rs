@@ -31,7 +31,7 @@ pub struct Snapshot {
     pub species: Vec<Species<'static>>,
     pub herds: Vec<Herd>,
     pub feeding_reports: Vec<FeedingReport>,
-    pub livestock: Vec<Livestock<'static>>,
+    pub livestock: Vec<Livestock>,
     pub employees: Vec<Employee<'static, 'static>>,
     pub health_reports: Vec<HealthReport>,
     pub warehouses: Vec<Warehouse>,
