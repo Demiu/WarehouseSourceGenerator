@@ -11,7 +11,8 @@ mod warehouse;
 
 use crate::employee::*;
 use crate::feeding_report::*;
-use crate::headcount_report::generate_headcount_report_vec;
+use crate::headcount_report::*;
+use crate::health_report::*;
 use crate::herd::*;
 use crate::livestock::*;
 use crate::pasture::*;
@@ -20,12 +21,6 @@ use crate::species::*;
 use crate::warehouse::*;
 use chrono::{Duration, Local, NaiveDate, NaiveDateTime, NaiveTime};
 use enum_map::enum_map;
-
-mod config {
-    use std::time::Duration;
-
-    pub const FEEDING_REPORT_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60 * 60);
-}
 
 fn main() {
     let names = vec![
@@ -126,8 +121,14 @@ fn main() {
         None,
         Duration::days(1),
     );
-
-    ss.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
+    ss.health_reports = generate_health_report_vec_for_headcount_vec(
+        &ss.headcount_reports,
+        &ss.employees,
+        &ss.herds,
+        0.15,
+        0.7,
+        0.3,
+    );
 
     ss.save_to_dir("out");
 }

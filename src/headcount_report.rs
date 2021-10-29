@@ -11,9 +11,9 @@ use crate::{employee::Employee, herd::Herd};
 pub struct HeadcountReport {
     id: usize,
     employee_id: usize,
-    herd_id: usize,
-    timestamp: NaiveDateTime,
-    quantity: u32,
+    pub herd_id: usize,
+    pub timestamp: NaiveDateTime,
+    pub quantity: u32,
 }
 
 impl HeadcountReport {

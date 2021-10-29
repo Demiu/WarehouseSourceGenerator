@@ -7,9 +7,6 @@ pub struct Herd {
     pub id: usize,
     pub pasture_id: usize,
     pub species_id: usize,
-
-    #[serde(skip_serializing)]
-    pub size: u32,
 }
 
 impl Herd {
@@ -18,7 +15,6 @@ impl Herd {
             id,
             pasture_id: pasture.id,
             species_id: species.id,
-            size: 0,
         }
     }
 }
