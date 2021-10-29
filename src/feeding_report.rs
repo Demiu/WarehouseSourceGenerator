@@ -34,20 +34,16 @@ impl FeedingReport {
 pub fn generate_feeding_report_vec(
     pastures: &Vec<Pasture>,
     count_per_pasture: usize,
-    last_report_date: Option<NaiveDateTime>,
+    last_report_dt: NaiveDateTime,
     report_interval: Duration,
 ) -> Vec<FeedingReport> {
-    let last_report_date = match last_report_date {
-        None => Local::now().naive_local(),
-        Some(date) => date,
-    };
-    let first_report_date = last_report_date - report_interval * count_per_pasture as i32;
+    let first_report_dt = last_report_dt - report_interval * count_per_pasture as i32;
 
     let mut rng = rand::thread_rng();
 
     let mut ret = vec![];
     for pasture in pastures {
-        let mut date = first_report_date;
+        let mut date = first_report_dt;
         ret.push(FeedingReport::new(
             ret.len(),
             date.date(),

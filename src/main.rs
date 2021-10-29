@@ -100,7 +100,8 @@ fn main() {
     ];
     expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
     expand_herd_vec(&mut ss.herds, &ss.species[..4], &ss.pastures);
-    ss.feeding_reports = generate_feeding_report_vec(&ss.pastures, 1000, None, Duration::days(1));
+    ss.feeding_reports =
+        generate_feeding_report_vec(&ss.pastures, 1000, snapshot1_when, Duration::days(1));
     expand_employee_vec(&mut ss.employees, 100, &names, &surnames, 3000.0, 12000.0);
     expand_warehouse_vec(&mut ss.warehouses, 16, &ss.employees);
     expand_livestock(
@@ -109,6 +110,7 @@ fn main() {
         &ss.species,
         &ss.pastures,
         livestock_birth_min,
+        snapshot1_when,
     );
     kill_off_livestock_vec(&mut ss.livestock, 0.1, &ss.species);
     butcher_livestock_vec(&mut ss.livestock, &ss.species, snapshot1_when);
@@ -118,7 +120,7 @@ fn main() {
         &ss.employees,
         900,
         1200,
-        None,
+        snapshot1_when,
         Duration::days(1),
     );
     ss.health_reports = generate_health_report_vec_for_headcount_vec(
@@ -130,5 +132,5 @@ fn main() {
         0.03,
     );
 
-    ss.save_to_dir("out");
+    ss.save_to_dir("out/snapshot1");
 }

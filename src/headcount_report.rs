@@ -1,4 +1,4 @@
-use chrono::{Duration, Local, NaiveDateTime};
+use chrono::{Duration, NaiveDateTime};
 use rand::{
     distributions::{Slice, Uniform},
     prelude::Distribution,
@@ -40,13 +40,9 @@ pub fn generate_headcount_report_vec(
     employees: &Vec<Employee>,
     min_count: u32,
     max_count: u32,
-    last_report_dt: Option<NaiveDateTime>,
+    last_report_dt: NaiveDateTime,
     report_interval: Duration,
 ) -> Vec<HeadcountReport> {
-    let last_report_dt = match last_report_dt {
-        None => Local::now().naive_local(),
-        Some(date) => date,
-    };
     let first_report_dt = last_report_dt - report_interval * count_per_herd as i32;
 
     let mut rng = rand::thread_rng();

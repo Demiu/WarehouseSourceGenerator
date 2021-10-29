@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use chrono::{Local, NaiveDateTime};
+use chrono::NaiveDateTime;
 use rand::{distributions::Uniform, prelude::Distribution, seq::index, Rng};
 use serde::Serialize;
 
@@ -47,11 +47,11 @@ pub fn expand_livestock(
     species: &Vec<Species>,
     pastures: &Vec<Pasture>,
     earliest_birth: NaiveDateTime,
+    latest_birth: NaiveDateTime,
 ) {
     let mut rng = rand::thread_rng();
 
-    let birth_span = Local::now()
-        .naive_local()
+    let birth_span = latest_birth
         .signed_duration_since(earliest_birth)
         .to_std()
         .unwrap();
