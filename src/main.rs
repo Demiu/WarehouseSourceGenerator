@@ -54,6 +54,7 @@ fn main() {
             0,
             "Angus Cow",
             SpeciesKind::Animal,
+            639,
             Some(SpeciesAreaRequirements {
                 pastureKindToReqArea: enum_map! {
                     PastureKind::Open => 10.,
@@ -66,6 +67,7 @@ fn main() {
             1,
             "Holstein Cow",
             SpeciesKind::Animal,
+            639,
             Some(SpeciesAreaRequirements {
                 pastureKindToReqArea: enum_map! {
                     PastureKind::Open => 10.,
@@ -78,6 +80,7 @@ fn main() {
             2,
             "Chicken",
             SpeciesKind::Animal,
+            42,
             Some(SpeciesAreaRequirements {
                 pastureKindToReqArea: enum_map! {
                     PastureKind::Open => 1.,
@@ -90,6 +93,7 @@ fn main() {
             3,
             "Sheep",
             SpeciesKind::Animal,
+            304,
             Some(SpeciesAreaRequirements {
                 pastureKindToReqArea: enum_map! {
                     PastureKind::Open => 7.5,
@@ -98,9 +102,9 @@ fn main() {
                 },
             }),
         ),
-        Species::new(4, "Wheat", SpeciesKind::Plant, None),
-        Species::new(5, "Corn", SpeciesKind::Plant, None),
-        Species::new(6, "Soybeans", SpeciesKind::Plant, None),
+        Species::new(4, "Wheat", SpeciesKind::Plant, 210, None),
+        Species::new(5, "Corn", SpeciesKind::Plant, 80, None),
+        Species::new(6, "Soybeans", SpeciesKind::Plant, 55, None),
     ];
     expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
     expand_herd_vec(&mut ss.herds, &ss.species[..4], &ss.pastures);
