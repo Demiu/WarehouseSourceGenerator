@@ -126,8 +126,8 @@ fn main() {
         &ss.employees,
         &ss.herds,
         0.15,
-        0.7,
-        0.3,
+        0.07,
+        0.03,
     );
 
     ss.save_to_dir("out");
