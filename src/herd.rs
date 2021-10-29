@@ -1,7 +1,4 @@
-use crate::{
-    pasture::Pasture,
-    species::Species,
-};
+use crate::{pasture::Pasture, species::Species};
 use rand::{distributions::Slice, prelude::Distribution};
 use serde::Serialize;
 

@@ -1,10 +1,7 @@
 use chrono::NaiveDateTime;
 use serde::Serialize;
 
-use crate::{
-    employee::Employee,
-    herd::Herd,
-};
+use crate::{employee::Employee, herd::Herd};
 
 #[derive(Serialize)]
 pub struct HealthReport {

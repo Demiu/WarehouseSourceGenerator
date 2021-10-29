@@ -11,6 +11,7 @@ mod warehouse;
 
 use crate::employee::*;
 use crate::feeding_report::*;
+use crate::headcount_report::generate_headcount_report_vec;
 use crate::herd::*;
 use crate::livestock::*;
 use crate::pasture::*;
@@ -104,7 +105,7 @@ fn main() {
     ];
     expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
     expand_herd_vec(&mut ss.herds, &ss.species[..4], &ss.pastures);
-    ss.feeding_reports = generate_feeding_report_vec(&ss.pastures, 1000, Duration::days(1), None);
+    ss.feeding_reports = generate_feeding_report_vec(&ss.pastures, 1000, None, Duration::days(1));
     expand_employee_vec(&mut ss.employees, 100, &names, &surnames, 3000.0, 12000.0);
     expand_warehouse_vec(&mut ss.warehouses, 16, &ss.employees);
     expand_livestock(
@@ -116,6 +117,15 @@ fn main() {
     );
     kill_off_livestock_vec(&mut ss.livestock, 0.1, &ss.species);
     butcher_livestock_vec(&mut ss.livestock, &ss.species, snapshot1_when);
+    ss.headcount_reports = generate_headcount_report_vec(
+        1000,
+        &ss.herds,
+        &ss.employees,
+        900,
+        1200,
+        None,
+        Duration::days(1),
+    );
 
     ss.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
 

@@ -34,8 +34,8 @@ impl FeedingReport {
 pub fn generate_feeding_report_vec(
     pastures: &Vec<Pasture>,
     count_per_pasture: usize,
-    report_interval: Duration,
     last_report_date: Option<NaiveDateTime>,
+    report_interval: Duration,
 ) -> Vec<FeedingReport> {
     let last_report_date = match last_report_date {
         None => Local::now().naive_local(),

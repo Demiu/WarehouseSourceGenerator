@@ -1,19 +1,10 @@
 use std::time::Duration;
 
 use chrono::{Local, NaiveDateTime};
-use rand::{
-    distributions::Uniform,
-    prelude::Distribution,
-    seq::index,
-    Rng,
-};
+use rand::{distributions::Uniform, prelude::Distribution, seq::index, Rng};
 use serde::Serialize;
 
-use crate::{
-    herd::Herd,
-    pasture::Pasture,
-    species::Species,
-};
+use crate::{herd::Herd, pasture::Pasture, species::Species};
 
 #[derive(Serialize)]
 pub enum DisposalPurpose {

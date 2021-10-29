@@ -1,8 +1,4 @@
-use std::{
-    fs::OpenOptions,
-    ops::Deref,
-    path::Path,
-};
+use std::{fs::OpenOptions, ops::Deref, path::Path};
 
 use chrono::{Local, NaiveDateTime};
 use rand::{
@@ -12,15 +8,9 @@ use rand::{
 use serde::Serialize;
 
 use crate::{
-    config,
-    employee::Employee,
-    feeding_report::FeedingReport,
-    health_report::HealthReport,
-    herd::Herd,
-    livestock::Livestock,
-    pasture::Pasture,
-    species::Species,
-    warehouse::Warehouse,
+    config, employee::Employee, feeding_report::FeedingReport, headcount_report::HeadcountReport,
+    health_report::HealthReport, herd::Herd, livestock::Livestock, pasture::Pasture,
+    species::Species, warehouse::Warehouse,
 };
 
 pub struct Snapshot {
@@ -32,6 +22,7 @@ pub struct Snapshot {
     pub employees: Vec<Employee<'static, 'static>>,
     pub health_reports: Vec<HealthReport>,
     pub warehouses: Vec<Warehouse>,
+    pub headcount_reports: Vec<HeadcountReport>,
 }
 
 impl Snapshot {
@@ -45,6 +36,7 @@ impl Snapshot {
             employees: vec![],
             health_reports: vec![],
             warehouses: vec![],
+            headcount_reports: vec![],
         }
     }
 
@@ -109,6 +101,10 @@ impl Snapshot {
         save_to_file(
             dir.join("warehouse").with_extension("csv"),
             &self.warehouses,
+        );
+        save_to_file(
+            dir.join("headcount_report").with_extension("csv"),
+            &self.headcount_reports,
         );
     }
 }
