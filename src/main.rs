@@ -12,6 +12,7 @@ mod warehouse;
 use crate::pasture::*;
 use crate::snapshot::*;
 use crate::species::*;
+use crate::warehouse::shuffle_managers_warehouse_vec;
 use chrono::{Duration, Local};
 use enum_map::enum_map;
 
@@ -146,5 +147,6 @@ fn main() {
         0.07,
         0.02,
     );
+    shuffle_managers_warehouse_vec(&mut ss.warehouses[..8], &ss.employees);
     ss.save_to_dir("out/snapshot2");
 }

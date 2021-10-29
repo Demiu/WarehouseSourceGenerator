@@ -1,24 +1,12 @@
-use std::{
-    fs::OpenOptions,
-    ops::Deref,
-    path::Path,
-    slice::SliceIndex,
-};
+use std::{fs::OpenOptions, ops::Deref, path::Path, slice::SliceIndex};
 
 use chrono::{Duration, NaiveDateTime};
 use enum_map::EnumMap;
 use serde::Serialize;
 
 use crate::{
-    employee::*,
-    feeding_report::*,
-    headcount_report::*,
-    health_report::*,
-    herd::*,
-    livestock::*,
-    pasture::*,
-    species::*,
-    warehouse::*,
+    employee::*, feeding_report::*, headcount_report::*, health_report::*, herd::*, livestock::*,
+    pasture::*, species::*, warehouse::*,
 };
 
 pub struct Snapshot {

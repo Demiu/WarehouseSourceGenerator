@@ -37,3 +37,14 @@ pub fn expand_warehouse_vec(
         ));
     }
 }
+
+pub fn shuffle_managers_warehouse_vec(warehouses: &mut [Warehouse], employees: &Vec<Employee>) {
+    let mut rng = rand::thread_rng();
+
+    for (i, manager) in employees
+        .choose_multiple(&mut rng, warehouses.len())
+        .enumerate()
+    {
+        warehouses[i].manager_id = manager.id;
+    }
+}
