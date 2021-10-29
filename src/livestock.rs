@@ -1,5 +1,12 @@
-use chrono::{Duration, Local, NaiveDateTime};
-use rand::{distributions::Uniform, prelude::Distribution, Rng};
+use std::time::Duration;
+
+use chrono::{Local, NaiveDate, NaiveDateTime};
+use rand::{
+    distributions::Uniform,
+    prelude::{Distribution, SliceRandom},
+    seq::index,
+    Rng,
+};
 use serde::Serialize;
 
 use crate::{
@@ -83,3 +90,22 @@ pub fn expand_livestock(
     }
 }
 
+pub fn kill_off_livestock_vec(
+    livestock: &mut Vec<Livestock>,
+    kill_pct: f32,
+    species: &Vec<Species>,
+) {
+    let mut rng = rand::thread_rng();
+
+    let kill_count = (livestock.len() as f32 * kill_pct) as usize;
+    let to_kill = index::sample(&mut rng, livestock.len(), kill_count);
+    for id in to_kill {
+        let animal = &mut livestock[id];
+        let species = &species[animal.species_id];
+        let lifespan =
+            chrono::Duration::from_std(rng.gen_range(Duration::new(0, 0)..species.lifespan))
+                .unwrap();
+        animal.disposal = Some(animal.birth + lifespan);
+        animal.disposal_purpose = Some(DisposalPurpose::Health);
+    }
+}

@@ -118,6 +118,7 @@ fn main() {
         &ss.pastures,
         livestock_birth_min,
     );
+    kill_off_livestock_vec(&mut ss.livestock, 0.1, &ss.species);
 
     ss.expand_health_reports_random(1000, 0.15, 0.07, 0.03);
 
