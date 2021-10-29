@@ -20,7 +20,7 @@ pub struct Species<'a> {
     kind: SpeciesKind,
 
     #[serde(skip_serializing)]
-    area_requirements: Option<SpeciesAreaRequirements>,
+    pub area_requirements: Option<SpeciesAreaRequirements>,
 }
 
 impl<'a> Species<'a> {

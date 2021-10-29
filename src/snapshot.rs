@@ -51,36 +51,6 @@ impl Snapshot {
         }
     }
 
-    pub fn expand_livestock_random(
-        &mut self,
-        herd_id: usize,
-        count: usize,
-        birth_min: NaiveDateTime,
-    ) {
-        let herd = &mut self.herds[herd_id];
-        let mut rng = rand::thread_rng();
-
-        let birth_span = Local::now()
-            .naive_local()
-            .signed_duration_since(birth_min)
-            .to_std()
-            .unwrap();
-        let distribution = Uniform::new(std::time::Duration::new(0, 0), birth_span);
-
-        let indicices = self.livestock.len()..(self.livestock.len() + count);
-        for id in indicices {
-            let birth_offset = chrono::Duration::from_std(distribution.sample(&mut rng)).unwrap();
-            self.livestock.push(Livestock::new(
-                id,
-                birth_min + birth_offset,
-                None,
-                None,
-                herd,
-            ));
-            herd.size += 1;
-        }
-    }
-
     pub fn expand_health_reports_random(
         &mut self,
         count_per_herd: usize,

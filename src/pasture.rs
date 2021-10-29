@@ -19,8 +19,8 @@ pub struct PastureAreaMinMax {
 #[derive(Serialize)]
 pub struct Pasture {
     pub id: usize,
-    area: f32,
-    kind: PastureKind,
+    pub area: f32,
+    pub kind: PastureKind,
 }
 
 impl Pasture {
