@@ -19,7 +19,7 @@ impl Herd {
     }
 }
 
-pub fn expand_herd_vec(herds: &mut Vec<Herd>, species: &[Species], pastures: &Vec<Pasture>) {
+pub fn expand_herd_vec(herds: &mut Vec<Herd>, pastures: &[Pasture], species: &[Species]) {
     let mut rng = rand::thread_rng();
     let species_distribution = Slice::new(species).unwrap();
 

@@ -34,27 +34,30 @@ impl HeadcountReport {
     }
 }
 
-pub fn generate_headcount_report_vec(
-    count_per_herd: usize,
+pub fn expand_headcount_report_vec(
+    headcount_reports: &mut Vec<HeadcountReport>,
     herds: &Vec<Herd>,
     employees: &Vec<Employee>,
     min_count: u32,
     max_count: u32,
+    first_report_dt: NaiveDateTime,
     last_report_dt: NaiveDateTime,
     report_interval: Duration,
-) -> Vec<HeadcountReport> {
-    let first_report_dt = last_report_dt - report_interval * count_per_herd as i32;
+) {
+    let count_per_herd = last_report_dt
+        .signed_duration_since(first_report_dt)
+        .num_seconds()
+        / report_interval.num_seconds();
 
     let mut rng = rand::thread_rng();
     let employee_distribution = Slice::new(employees).unwrap();
     let quantity_distribution = Uniform::new(min_count, max_count);
 
-    let mut ret = vec![];
     for herd in herds {
         let mut timestamp = first_report_dt;
         for _ in 0..count_per_herd {
-            ret.push(HeadcountReport::new(
-                ret.len(),
+            headcount_reports.push(HeadcountReport::new(
+                headcount_reports.len(),
                 employee_distribution.sample(&mut rng),
                 herd,
                 timestamp,
@@ -63,6 +66,4 @@ pub fn generate_headcount_report_vec(
             timestamp += report_interval;
         }
     }
-
-    return ret;
 }

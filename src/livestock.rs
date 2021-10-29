@@ -65,7 +65,11 @@ pub fn expand_livestock(
             .as_ref()
             .unwrap()
             .pasture_kind_to_req_area[pasture.kind];
-        let count = (pasture.area / area_requirement) as usize;
+        let count = (pasture.area
+            / (area_requirement
+                * chrono::Duration::from_std(species.lifespan)
+                    .unwrap()
+                    .num_days() as f32)) as usize;
         for _ in 0..count {
             let birth_offset =
                 chrono::Duration::from_std(birth_offset_distribution.sample(&mut rng)).unwrap();
@@ -84,6 +88,7 @@ pub fn kill_off_livestock_vec(
     livestock: &mut Vec<Livestock>,
     kill_pct: f32,
     species: &Vec<Species>,
+    max_date: NaiveDateTime,
 ) {
     let mut rng = rand::thread_rng();
 
@@ -91,11 +96,18 @@ pub fn kill_off_livestock_vec(
     let to_kill = index::sample(&mut rng, livestock.len(), kill_count);
     for id in to_kill {
         let animal = &mut livestock[id];
+        if let Some(_) = animal.disposal {
+            continue;
+        }
         let species = &species[animal.species_id];
         let lifespan =
             chrono::Duration::from_std(rng.gen_range(Duration::new(0, 0)..species.lifespan))
                 .unwrap();
-        animal.disposal = Some(animal.birth + lifespan);
+        let mut disposal_time = animal.birth + lifespan;
+        if disposal_time > max_date {
+            disposal_time = max_date;
+        }
+        animal.disposal = Some(disposal_time);
         animal.disposal_purpose = Some(DisposalPurpose::Health);
     }
 }

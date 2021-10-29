@@ -23,10 +23,10 @@ use chrono::{Duration, Local, NaiveDate, NaiveDateTime, NaiveTime};
 use enum_map::enum_map;
 
 fn main() {
-    let names = vec![
+    let names = [
         "Ben", "Bob", "Gus", "Jim", "Joe", "Sam", "Tim", "Tom", "Ada", "Ann", "Deb",
     ];
-    let surnames = vec![
+    let surnames = [
         "Ali", "Ash", "Cho", "Ito", "Kim", "Lis", "Rey", "Sun", "Way", "Xie", "Zhu",
     ];
     let pasture_size_ranges = enum_map! {
@@ -38,7 +38,11 @@ fn main() {
         NaiveDate::from_ymd(2019, 1, 1),
         NaiveTime::from_hms(00, 00, 00),
     );
-    let snapshot1_when = Local::now().naive_local() - Duration::weeks(10);
+
+    let report_interval = Duration::days(1);
+    let snapshot2_when = Local::now().naive_local();
+    let snapshot1_when = snapshot2_when - Duration::days(6 * 30 + 3);
+    let initial_when = snapshot1_when - report_interval * 1000;
 
     let mut ss = Snapshot::new();
     ss.species = vec![
@@ -98,39 +102,39 @@ fn main() {
         Species::new(5, "Corn", SpeciesKind::Plant, 80, None),
         Species::new(6, "Soybeans", SpeciesKind::Plant, 55, None),
     ];
-    expand_pasture_vec(&mut ss.pastures, 1000, pasture_size_ranges);
-    expand_herd_vec(&mut ss.herds, &ss.species[..4], &ss.pastures);
-    ss.feeding_reports =
-        generate_feeding_report_vec(&ss.pastures, 1000, snapshot1_when, Duration::days(1));
-    expand_employee_vec(&mut ss.employees, 100, &names, &surnames, 3000.0, 12000.0);
-    expand_warehouse_vec(&mut ss.warehouses, 16, &ss.employees);
-    expand_livestock(
-        &mut ss.livestock,
-        &ss.herds,
-        &ss.species,
-        &ss.pastures,
-        livestock_birth_min,
+    ss.expand(
+        initial_when,
         snapshot1_when,
-    );
-    kill_off_livestock_vec(&mut ss.livestock, 0.1, &ss.species);
-    butcher_livestock_vec(&mut ss.livestock, &ss.species, snapshot1_when);
-    ss.headcount_reports = generate_headcount_report_vec(
+        report_interval,
         1000,
-        &ss.herds,
-        &ss.employees,
-        900,
-        1200,
-        snapshot1_when,
-        Duration::days(1),
-    );
-    ss.health_reports = generate_health_report_vec_for_headcount_vec(
-        &ss.headcount_reports,
-        &ss.employees,
-        &ss.herds,
-        0.15,
+        pasture_size_ranges,
+        ..3,
+        100,
+        &names,
+        &surnames,
+        3000.0,
+        12000.0,
+        16,
+        0.1,
+        9000,
+        12000,
+        0.1,
         0.07,
-        0.03,
+        0.02,
     );
-
     ss.save_to_dir("out/snapshot1");
+
+    ss.species.push(Species::new(
+        ss.species.len(),
+        "Pig",
+        SpeciesKind::Animal,
+        167,
+        Some(SpeciesAreaRequirements {
+            pasture_kind_to_req_area: enum_map! {
+                PastureKind::Open => 9.,
+                PastureKind::Covered => 7.,
+                PastureKind::Individual => 4.,
+            },
+        }),
+    ));
 }

@@ -38,8 +38,8 @@ impl<'a, 'b> Employee<'a, 'b> {
 pub fn expand_employee_vec(
     employees: &mut Vec<Employee>,
     count: usize,
-    names: &Vec<&'static str>,
-    surnames: &Vec<&'static str>,
+    names: &[&'static str],
+    surnames: &[&'static str],
     salary_min: f32,
     salary_max: f32,
 ) {

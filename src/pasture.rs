@@ -32,7 +32,7 @@ impl Pasture {
 pub fn expand_pasture_vec(
     pastures: &mut Vec<Pasture>,
     count: usize,
-    size_ranges: EnumMap<PastureKind, PastureAreaMinMax>,
+    size_ranges: &EnumMap<PastureKind, PastureAreaMinMax>,
 ) {
     let mut rng = rand::thread_rng();
 

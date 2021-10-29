@@ -43,21 +43,21 @@ impl HealthReport {
     }
 }
 
-pub fn generate_health_report_vec_for_headcount_vec(
-    headcount_reports: &Vec<HeadcountReport>,
+pub fn expand_health_report_vec_for_headcount_vec(
+    health_reports: &mut Vec<HealthReport>,
+    headcount_reports: &[HeadcountReport],
     employees: &Vec<Employee>,
     herds: &Vec<Herd>,
     ill_max_pct: f32,
     severly_ill_max_pct: f32,
     terminal_max_pct: f32,
-) -> Vec<HealthReport> {
+) {
     let mut rng = rand::thread_rng();
     let employee_distribution = Slice::new(employees).unwrap();
     let ill_distribution = Uniform::new(0.0, ill_max_pct);
     let severly_ill_distribution = Uniform::new(0.0, severly_ill_max_pct);
     let terminal_distribution = Uniform::new(0.0, terminal_max_pct);
 
-    let mut ret = vec![];
     for hc in headcount_reports {
         let doctor = employee_distribution.sample(&mut rng);
         let total_count = hc.quantity;
@@ -66,8 +66,8 @@ pub fn generate_health_report_vec_for_headcount_vec(
             (total_count as f32 * severly_ill_distribution.sample(&mut rng)) as u32;
         let terminal_count = (total_count as f32 * terminal_distribution.sample(&mut rng)) as u32;
         let healthy_count = total_count - ill_count - severly_ill_count - terminal_count;
-        ret.push(HealthReport::new(
-            ret.len(),
+        health_reports.push(HealthReport::new(
+            health_reports.len(),
             doctor,
             &herds[hc.herd_id],
             hc.timestamp,
@@ -77,6 +77,4 @@ pub fn generate_health_report_vec_for_headcount_vec(
             terminal_count,
         ))
     }
-
-    return ret;
 }

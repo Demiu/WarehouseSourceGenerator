@@ -1,11 +1,24 @@
-use std::{fs::OpenOptions, ops::Deref, path::Path};
+use std::{
+    fs::OpenOptions,
+    ops::{Deref, Index},
+    path::Path,
+    slice::SliceIndex,
+};
 
+use chrono::{Duration, NaiveDateTime};
+use enum_map::EnumMap;
 use serde::Serialize;
 
 use crate::{
-    employee::Employee, feeding_report::FeedingReport, headcount_report::HeadcountReport,
-    health_report::HealthReport, herd::Herd, livestock::Livestock, pasture::Pasture,
-    species::Species, warehouse::Warehouse,
+    employee::{self, expand_employee_vec, Employee},
+    feeding_report::{expand_feeding_report_vec, FeedingReport},
+    headcount_report::{expand_headcount_report_vec, HeadcountReport},
+    health_report::{expand_health_report_vec_for_headcount_vec, HealthReport},
+    herd::{expand_herd_vec, Herd},
+    livestock::{butcher_livestock_vec, expand_livestock, kill_off_livestock_vec, Livestock},
+    pasture::{expand_pasture_vec, Pasture, PastureAreaMinMax, PastureKind},
+    species::Species,
+    warehouse::{expand_warehouse_vec, Warehouse},
 };
 
 pub struct Snapshot {
@@ -33,6 +46,84 @@ impl Snapshot {
             warehouses: vec![],
             headcount_reports: vec![],
         }
+    }
+
+    pub fn expand<T>(
+        &mut self,
+        from_when: NaiveDateTime,
+        to_when: NaiveDateTime,
+        reports_interval: Duration,
+        new_pastures: usize,
+        pasture_ranges: EnumMap<PastureKind, PastureAreaMinMax>,
+        species_for_herds: T,
+        hired_employees_count: usize,
+        employee_names: &[&'static str],
+        employee_surnames: &[&'static str],
+        employee_salary_min: f32,
+        employee_salary_max: f32,
+        new_warehouse_count: usize,
+        kill_off_pct: f32,
+        headcount_min_count: u32,
+        headcount_max_count: u32,
+        ill_max_pct: f32,
+        severly_ill_max_pct: f32,
+        terminal_max_pct: f32,
+    ) where
+        T: SliceIndex<[Species<'static>], Output = [Species<'static>]>,
+    {
+        let old_pasture_count = self.pastures.len(); // we're only generating herds for new pastures
+        let old_headcount_report_count = self.headcount_reports.len(); // only generate health reports for new headcounts
+        expand_pasture_vec(&mut self.pastures, new_pastures, &pasture_ranges);
+        expand_herd_vec(
+            &mut self.herds,
+            &self.pastures[old_pasture_count..],
+            &self.species[species_for_herds],
+        );
+        expand_feeding_report_vec(
+            &mut self.feeding_reports,
+            &self.pastures,
+            from_when,
+            to_when,
+            reports_interval,
+        );
+        expand_employee_vec(
+            &mut self.employees,
+            hired_employees_count,
+            employee_names,
+            employee_surnames,
+            employee_salary_min,
+            employee_salary_max,
+        );
+        expand_warehouse_vec(&mut self.warehouses, new_warehouse_count, &self.employees);
+        expand_livestock(
+            &mut self.livestock,
+            &self.herds,
+            &self.species,
+            &self.pastures,
+            from_when,
+            to_when,
+        );
+        kill_off_livestock_vec(&mut self.livestock, kill_off_pct, &self.species, to_when);
+        butcher_livestock_vec(&mut self.livestock, &self.species, to_when);
+        expand_headcount_report_vec(
+            &mut self.headcount_reports,
+            &self.herds,
+            &self.employees,
+            headcount_min_count,
+            headcount_max_count,
+            from_when,
+            to_when,
+            reports_interval,
+        );
+        expand_health_report_vec_for_headcount_vec(
+            &mut self.health_reports,
+            &self.headcount_reports[old_headcount_report_count..],
+            &self.employees,
+            &self.herds,
+            ill_max_pct,
+            severly_ill_max_pct,
+            terminal_max_pct,
+        );
     }
 
     pub fn save_to_dir(&self, dir: &str) {

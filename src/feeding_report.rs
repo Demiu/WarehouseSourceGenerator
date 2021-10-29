@@ -31,33 +31,36 @@ impl FeedingReport {
     }
 }
 
-pub fn generate_feeding_report_vec(
+pub fn expand_feeding_report_vec(
+    feeding_reports: &mut Vec<FeedingReport>,
     pastures: &Vec<Pasture>,
-    count_per_pasture: usize,
+    first_report_dt: NaiveDateTime,
     last_report_dt: NaiveDateTime,
     report_interval: Duration,
-) -> Vec<FeedingReport> {
-    let first_report_dt = last_report_dt - report_interval * count_per_pasture as i32;
+) {
+    let count_per_pasture = last_report_dt
+        .signed_duration_since(first_report_dt)
+        .num_seconds()
+        / report_interval.num_seconds();
 
     let mut rng = rand::thread_rng();
 
-    let mut ret = vec![];
     for pasture in pastures {
         let mut date = first_report_dt;
-        ret.push(FeedingReport::new(
-            ret.len(),
+        feeding_reports.push(FeedingReport::new(
+            feeding_reports.len(),
             date.date(),
             pasture,
-            100.0,
-            rng.gen(),
+            0.0,
+            rng.gen_range(0.0..100.0),
         ));
         for _ in 0..(count_per_pasture - 1) {
             date += report_interval;
-            let prev_report = ret.last().unwrap();
+            let prev_report = feeding_reports.last().unwrap();
             let start_fill = rng.gen_range(0.0..prev_report.end_fill_pct);
             let end_fill = rng.gen_range(start_fill..=100.0);
-            ret.push(FeedingReport::new(
-                ret.len(),
+            feeding_reports.push(FeedingReport::new(
+                feeding_reports.len(),
                 date.date(),
                 pasture,
                 start_fill,
@@ -65,6 +68,4 @@ pub fn generate_feeding_report_vec(
             ));
         }
     }
-
-    return ret;
 }
