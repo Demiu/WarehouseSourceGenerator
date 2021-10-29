@@ -1,6 +1,6 @@
 use std::{
     fs::OpenOptions,
-    ops::{Deref, Index},
+    ops::Deref,
     path::Path,
     slice::SliceIndex,
 };
@@ -10,15 +10,15 @@ use enum_map::EnumMap;
 use serde::Serialize;
 
 use crate::{
-    employee::{self, expand_employee_vec, Employee},
-    feeding_report::{expand_feeding_report_vec, FeedingReport},
-    headcount_report::{expand_headcount_report_vec, HeadcountReport},
-    health_report::{expand_health_report_vec_for_headcount_vec, HealthReport},
-    herd::{expand_herd_vec, Herd},
-    livestock::{butcher_livestock_vec, expand_livestock, kill_off_livestock_vec, Livestock},
-    pasture::{expand_pasture_vec, Pasture, PastureAreaMinMax, PastureKind},
-    species::Species,
-    warehouse::{expand_warehouse_vec, Warehouse},
+    employee::*,
+    feeding_report::*,
+    headcount_report::*,
+    health_report::*,
+    herd::*,
+    livestock::*,
+    pasture::*,
+    species::*,
+    warehouse::*,
 };
 
 pub struct Snapshot {
@@ -54,7 +54,7 @@ impl Snapshot {
         to_when: NaiveDateTime,
         reports_interval: Duration,
         new_pastures: usize,
-        pasture_ranges: EnumMap<PastureKind, PastureAreaMinMax>,
+        pasture_ranges: &EnumMap<PastureKind, PastureAreaMinMax>,
         species_for_herds: T,
         hired_employees_count: usize,
         employee_names: &[&'static str],

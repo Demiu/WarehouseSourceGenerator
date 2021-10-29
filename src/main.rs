@@ -9,17 +9,10 @@ mod snapshot;
 mod species;
 mod warehouse;
 
-use crate::employee::*;
-use crate::feeding_report::*;
-use crate::headcount_report::*;
-use crate::health_report::*;
-use crate::herd::*;
-use crate::livestock::*;
 use crate::pasture::*;
 use crate::snapshot::*;
 use crate::species::*;
-use crate::warehouse::*;
-use chrono::{Duration, Local, NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{Duration, Local};
 use enum_map::enum_map;
 
 fn main() {
@@ -34,10 +27,6 @@ fn main() {
         PastureKind::Covered => PastureAreaMinMax { min: 10., max: 900. },
         PastureKind::Individual => PastureAreaMinMax { min: 1., max: 10. },
     };
-    let livestock_birth_min = NaiveDateTime::new(
-        NaiveDate::from_ymd(2019, 1, 1),
-        NaiveTime::from_hms(00, 00, 00),
-    );
 
     let report_interval = Duration::days(1);
     let snapshot2_when = Local::now().naive_local();
@@ -107,7 +96,7 @@ fn main() {
         snapshot1_when,
         report_interval,
         1000,
-        pasture_size_ranges,
+        &pasture_size_ranges,
         ..3,
         100,
         &names,
@@ -137,4 +126,25 @@ fn main() {
             },
         }),
     ));
+    ss.expand(
+        snapshot1_when,
+        snapshot2_when,
+        report_interval,
+        100,
+        &pasture_size_ranges,
+        (ss.species.len() - 1)..,
+        0,
+        &names,
+        &surnames,
+        3000.0,
+        12000.0,
+        0,
+        0.2,
+        9000,
+        12000,
+        0.1,
+        0.07,
+        0.02,
+    );
+    ss.save_to_dir("out/snapshot2");
 }
