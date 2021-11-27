@@ -12,11 +12,12 @@ mod warehouse;
 use crate::pasture::*;
 use crate::snapshot::*;
 use crate::species::*;
-use crate::warehouse::shuffle_managers_warehouse_vec;
+use crate::warehouse::*;
 use chrono::{Duration, Local};
 use enum_map::enum_map;
 
 fn main() {
+    // configuration data
     let names = [
         "Ben", "Bob", "Gus", "Jim", "Joe", "Sam", "Tim", "Tom", "Ada", "Ann", "Deb",
     ];
@@ -34,6 +35,7 @@ fn main() {
     let snapshot1_when = snapshot2_when - Duration::days(6 * 30 + 3);
     let initial_when = snapshot1_when - report_interval * 1000;
 
+    // snapshot setup
     let mut ss = Snapshot::new();
     ss.species = vec![
         Species::new(
@@ -92,6 +94,8 @@ fn main() {
         Species::new(5, "Corn", SpeciesKind::Plant, 80, None),
         Species::new(6, "Soybeans", SpeciesKind::Plant, 55, None),
     ];
+
+    // first snapshot
     ss.expand(
         initial_when,
         snapshot1_when,
@@ -114,6 +118,7 @@ fn main() {
     );
     ss.save_to_dir("out/snapshot1");
 
+    // expand the species and make a second snapshot
     ss.species.push(Species::new(
         ss.species.len(),
         "Pig",
@@ -147,6 +152,7 @@ fn main() {
         0.07,
         0.02,
     );
-    shuffle_managers_warehouse_vec(&mut ss.warehouses[..8], &ss.employees);
+    // SCD in second snapshot
+    randomly_enlarge_warehouses(&mut ss.warehouses, 40000., 90000.);
     ss.save_to_dir("out/snapshot2");
 }

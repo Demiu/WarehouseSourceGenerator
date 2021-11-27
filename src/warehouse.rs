@@ -1,5 +1,5 @@
 use crate::employee::Employee;
-use rand::{prelude::SliceRandom, Rng};
+use rand::{prelude::*, Rng};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -38,13 +38,13 @@ pub fn expand_warehouse_vec(
     }
 }
 
-pub fn shuffle_managers_warehouse_vec(warehouses: &mut [Warehouse], employees: &Vec<Employee>) {
+pub fn randomly_enlarge_warehouses(warehouses: &mut [Warehouse], maximum_extra_area: f32, maximum_extra_volume: f32) {
     let mut rng = rand::thread_rng();
 
-    for (i, manager) in employees
-        .choose_multiple(&mut rng, warehouses.len())
-        .enumerate()
+    let to_edit = rng.gen_range(0..warehouses.len());
+    for warehouse in warehouses.iter_mut().choose_multiple(&mut rng, to_edit)
     {
-        warehouses[i].manager_id = manager.id;
+        warehouse.area += rng.gen_range(0.0..maximum_extra_area);
+        warehouse.volume += rng.gen_range(0.0..maximum_extra_volume);
     }
 }
