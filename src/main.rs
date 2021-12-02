@@ -66,7 +66,7 @@ fn main() {
         ),
         Species::new(
             2,
-            "Chicken",
+            "Leghorn Chicken",
             SpeciesKind::Animal,
             42,
             Some(SpeciesAreaRequirements {
@@ -79,7 +79,20 @@ fn main() {
         ),
         Species::new(
             3,
-            "Sheep",
+            "Bronze Turkey",
+            SpeciesKind::Animal,
+            42,
+            Some(SpeciesAreaRequirements {
+                pasture_kind_to_req_area: enum_map! {
+                    PastureKind::Open => 1.,
+                    PastureKind::Covered => 1.,
+                    PastureKind::Individual => 0.25,
+                },
+            }),
+        ),
+        Species::new(
+            4,
+            "Lincoln Sheep",
             SpeciesKind::Animal,
             304,
             Some(SpeciesAreaRequirements {
@@ -90,10 +103,11 @@ fn main() {
                 },
             }),
         ),
-        Species::new(4, "Wheat", SpeciesKind::Plant, 210, None),
-        Species::new(5, "Corn", SpeciesKind::Plant, 80, None),
-        Species::new(6, "Soybeans", SpeciesKind::Plant, 55, None),
+        Species::new(5, "Wheat", SpeciesKind::Plant, 210, None),
+        Species::new(6, "Corn", SpeciesKind::Plant, 80, None),
+        Species::new(7, "Soybeans", SpeciesKind::Plant, 55, None),
     ];
+    let mut species_for_herds = vec![0, 1, 2, 3, 4];
 
     // first snapshot
     ss.expand(
@@ -102,7 +116,7 @@ fn main() {
         report_interval,
         1000,
         &pasture_size_ranges,
-        ..3,
+        species_for_herds.as_slice(),
         100,
         &names,
         &surnames,
@@ -121,7 +135,7 @@ fn main() {
     // expand the species and make a second snapshot
     ss.species.push(Species::new(
         ss.species.len(),
-        "Pig",
+        "Yorkshire Pig",
         SpeciesKind::Animal,
         167,
         Some(SpeciesAreaRequirements {
@@ -132,13 +146,14 @@ fn main() {
             },
         }),
     ));
+    species_for_herds.push(ss.species.len() - 1);
     ss.expand(
         snapshot1_when,
         snapshot2_when,
         report_interval,
         100,
         &pasture_size_ranges,
-        (ss.species.len() - 1)..,
+        &species_for_herds,
         0,
         &names,
         &surnames,

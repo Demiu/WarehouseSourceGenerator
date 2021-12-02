@@ -38,12 +38,15 @@ pub fn expand_warehouse_vec(
     }
 }
 
-pub fn randomly_enlarge_warehouses(warehouses: &mut [Warehouse], maximum_extra_area: f32, maximum_extra_volume: f32) {
+pub fn randomly_enlarge_warehouses(
+    warehouses: &mut [Warehouse],
+    maximum_extra_area: f32,
+    maximum_extra_volume: f32,
+) {
     let mut rng = rand::thread_rng();
 
     let to_edit = rng.gen_range(0..warehouses.len());
-    for warehouse in warehouses.iter_mut().choose_multiple(&mut rng, to_edit)
-    {
+    for warehouse in warehouses.iter_mut().choose_multiple(&mut rng, to_edit) {
         warehouse.area += rng.gen_range(0.0..maximum_extra_area);
         warehouse.volume += rng.gen_range(0.0..maximum_extra_volume);
     }

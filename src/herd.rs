@@ -19,15 +19,20 @@ impl Herd {
     }
 }
 
-pub fn expand_herd_vec(herds: &mut Vec<Herd>, pastures: &[Pasture], species: &[Species]) {
+pub fn expand_herd_vec(
+    herds: &mut Vec<Herd>,
+    pastures: &[Pasture],
+    species: &[Species],
+    species_idxs: &[usize],
+) {
     let mut rng = rand::thread_rng();
-    let species_distribution = Slice::new(species).unwrap();
+    let species_idxs_distribution = Slice::new(species_idxs).unwrap();
 
     for pasture in pastures.iter() {
         herds.push(Herd::new(
             herds.len(),
             pasture,
-            species_distribution.sample(&mut rng),
+            &species[*species_idxs_distribution.sample(&mut rng)],
         ));
     }
 }

@@ -1,4 +1,4 @@
-use std::{fs::OpenOptions, ops::Deref, path::Path, slice::SliceIndex};
+use std::{fs::OpenOptions, ops::Deref, path::Path};
 
 use chrono::{Duration, NaiveDateTime};
 use enum_map::EnumMap;
@@ -36,14 +36,14 @@ impl Snapshot {
         }
     }
 
-    pub fn expand<T>(
+    pub fn expand(
         &mut self,
         from_when: NaiveDateTime,
         to_when: NaiveDateTime,
         reports_interval: Duration,
         new_pastures: usize,
         pasture_ranges: &EnumMap<PastureKind, PastureAreaMinMax>,
-        species_for_herds: T,
+        species_for_herds: &[usize],
         hired_employees_count: usize,
         employee_names: &[&'static str],
         employee_surnames: &[&'static str],
@@ -56,16 +56,15 @@ impl Snapshot {
         ill_max_pct: f32,
         severly_ill_max_pct: f32,
         terminal_max_pct: f32,
-    ) where
-        T: SliceIndex<[Species<'static>], Output = [Species<'static>]>,
-    {
+    ) {
         let old_pasture_count = self.pastures.len(); // we're only generating herds for new pastures
         let old_headcount_report_count = self.headcount_reports.len(); // only generate health reports for new headcounts
         expand_pasture_vec(&mut self.pastures, new_pastures, &pasture_ranges);
         expand_herd_vec(
             &mut self.herds,
             &self.pastures[old_pasture_count..],
-            &self.species[species_for_herds],
+            &self.species,
+            species_for_herds,
         );
         expand_feeding_report_vec(
             &mut self.feeding_reports,
